@@ -1,0 +1,2459 @@
+/* css/styles.css
+   Visual language for the Obeya PoC board: calm, high-contrast, built to be
+   read from across a meeting room. Status is always dot + text, never color
+   alone. */
+
+:root {
+  --bg: #f1f4f3;
+  --panel: #ffffff;
+  --panel-soft: #eef1f0;
+  /* Distinct from --bg (deliberately, not just a shade off) so a theme
+     column reads as its own tray rather than blending into the page —
+     --panel-soft was too close to --bg for that. Only used for the column
+     background/border; --panel-soft keeps its original job of a subtle
+     inset on white panels elsewhere. */
+  --column-bg: #d7e2dc;
+  --column-border: #a9bcb5;
+  --ink: #1c2b33;
+  --ink-soft: #5b6b73;
+  --ink-faint: #8a969c;
+  --line: #dbe2e0;
+  --line-soft: #e9edec;
+
+  --canal: #234559;
+  --canal-deep: #16303f;
+  --amber-accent: #d9a441;
+
+  --green: #2f7a4d;
+  --green-bg: #e4f3e9;
+  --amber: #a9711a;
+  --amber-bg: #faf0dc;
+  --red: #a23f30;
+  --red-bg: #fbe8e4;
+  --grey: #5b6b73;
+  --grey-bg: #eceff0;
+  --blue: #2b6ca3;
+  --blue-bg: #e2eef7;
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 2px rgba(20, 30, 35, 0.07), 0 6px 18px rgba(20, 30, 35, 0.06);
+  --shadow-modal: 0 24px 60px rgba(10, 20, 25, 0.3);
+
+  --font: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#app {
+  /* Bewust géén max-width: op een meeting-room-scherm of groot display moet
+     het bord de volledige breedte kunnen benutten (meer thema-kolommen
+     zichtbaar zonder te scrollen) — de tekstzware onderdelen (visietekst,
+     modal, matrix-intro) begrenzen hun eigen leesbreedte al apart. */
+  padding: 12px 24px 64px;
+}
+
+a { color: inherit; }
+
+.muted { color: var(--ink-faint); }
+
+button {
+  font-family: inherit;
+}
+
+/* ---------- header ---------- */
+
+.app-header {
+  margin-bottom: 0;
+}
+
+.app-header__title-block {
+  display: flex;
+  align-items: baseline;
+  gap: 4px 10px;
+  flex-wrap: wrap;
+}
+
+
+.app-header__title {
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: 0.2px;
+  color: var(--canal-deep);
+  margin: 0;
+}
+
+.app-header__sub {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.app-header__vision {
+  margin: 2px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  border-left: 3px solid var(--amber-accent);
+  padding-left: 12px;
+}
+
+/* ---------- tabs ---------- */
+
+/* Tabbladen links en de bediening voor in een sessie rechts, op één regel
+   (idee 55); de lijn onder de tabbladen loopt over de hele breedte. */
+.app-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 0 0 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.app-bar .toolbar__group {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-bar .btn { white-space: nowrap; }
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.tab {
+  padding: 9px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tab:hover { color: var(--canal-deep); }
+
+.tab--active {
+  color: var(--canal-deep);
+  border-bottom-color: var(--amber-accent);
+}
+
+/* ---------- filter bar + toolbar ---------- */
+
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.filter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.filter-panel[hidden] { display: none; }
+
+.filter-active {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-active__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: var(--panel-soft);
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.filter-active__remove {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 100px;
+  color: var(--ink-soft);
+}
+
+.filter-active__remove:hover { background: var(--line); color: var(--ink); }
+
+.filter-bar__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  opacity: 0.55;
+}
+
+.filter-chip.chip--on {
+  opacity: 1;
+}
+
+#filter-owner, #filter-year, #filter-quarter, #filter-principle, #filter-search {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: var(--panel);
+  color: var(--ink);
+}
+
+#filter-search {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  min-width: 180px;
+  flex: 0 1 260px;
+}
+
+.filter-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-left: auto;
+  padding-bottom: 5px;
+  flex-wrap: wrap;
+}
+
+.toolbar__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+}
+
+.save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.save-indicator__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  flex: none;
+}
+
+/* Vier soorten handelingen die er eerder identiek uitzagen: weergave,
+   wijzigingen, data en beheer. Een dunne scheiding met wat lucht is genoeg om
+   ze uit elkaar te houden zonder de balk zwaarder te maken. Zie ROADMAP idee
+   48. */
+.toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+
+.toolbar__group:first-of-type {
+  padding-left: 0;
+  border-left: none;
+}
+
+/* ---------- zoomniveau (Overzicht/Detail) ---------- */
+
+.zoom-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.zoom-toggle__btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 100px;
+  background: none;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.zoom-toggle__btn:not(.zoom-toggle__btn--active):hover { color: var(--canal-deep); }
+
+.zoom-toggle__btn--active {
+  background: var(--canal-deep);
+  color: #fff;
+}
+
+/* ---------- buttons + chips ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--canal-deep);
+  background: var(--canal-deep);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover { background: var(--canal); }
+
+.btn--ghost {
+  background: none;
+  color: var(--canal-deep);
+}
+
+.btn--ghost:hover { background: var(--line-soft); }
+
+.btn--primary {
+  background: var(--canal-deep);
+}
+
+.btn--small {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-faint);
+  font-size: 15px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.icon-btn:hover { color: var(--red); background: var(--red-bg); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 10px;
+  border-radius: 100px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.chip:hover { border-color: var(--canal); }
+
+.chip-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ---------- status pills + dots ---------- */
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+  display: inline-block;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+
+.status-pill--compact {
+  font-size: 11.5px;
+  padding: 3px 8px;
+}
+
+.status-green, .status-dot--green { background: var(--green-bg); color: var(--green); }
+.status-amber, .status-dot--amber { background: var(--amber-bg); color: var(--amber); }
+.status-red, .status-dot--red { background: var(--red-bg); color: var(--red); }
+.status-grey, .status-dot--grey { background: var(--grey-bg); color: var(--grey); }
+.status-blue, .status-dot--blue { background: var(--blue-bg); color: var(--blue); }
+/* "Klaar" (meetbaar resultaat) hergebruikt bewust de groene kleur — beide
+   zijn een positieve uitkomst, alleen het label verschilt per entiteitstype. */
+.status-done, .status-dot--done { background: var(--green-bg); color: var(--green); }
+
+.status-pill .status-dot { background: currentColor; }
+.status-dot--green, .status-dot--amber, .status-dot--red, .status-dot--grey, .status-dot--blue, .status-dot--done {
+  background: currentColor;
+}
+.status-dot--green { color: var(--green); }
+.status-dot--amber { color: var(--amber); }
+.status-dot--red { color: var(--red); }
+.status-dot--grey { color: var(--grey); }
+.status-dot--blue { color: var(--blue); }
+.status-dot--done { color: var(--green); }
+
+.status-select,
+.owner-select {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.owner-select { max-width: 100%; }
+
+.owner-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  color: var(--ink-soft);
+  background: var(--panel-soft);
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+
+.owner-badge--empty {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.tp-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--canal-deep);
+  background: #dfe9ee;
+  border: 1px solid #c3d6de;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+/* Entiteitstype-badge: bewust monochroom (geen kleur per type, zie idee 45
+   in IDEAS.md) — kleur is al bezet door status en thema. */
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  background: var(--line-soft);
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  border-radius: 5px;
+  flex: none;
+  vertical-align: middle;
+  margin-right: 4px;
+  margin-top: -2px;
+}
+
+/* Thema-accent: vierkant i.p.v. rond, zodat het nooit met de status-dot
+   verward wordt. Kleur komt uit theme.color (ObeyaData.themeColor). */
+.theme-swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  flex: none;
+  margin-right: 1px;
+}
+
+/* ---------- board ---------- */
+
+.board-main { min-height: 200px; }
+
+.board {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  align-items: flex-start;
+  /* Always show a visible, styled horizontal scrollbar (rather than an
+     OS-hidden one) so it's obvious there are more theme columns to the
+     right — a plain vertical mouse wheel is also translated to horizontal
+     scroll here, see js/app.js. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-faint) var(--line-soft);
+}
+
+.board::-webkit-scrollbar {
+  height: 10px;
+}
+
+.board::-webkit-scrollbar-track {
+  background: var(--line-soft);
+  border-radius: 100px;
+}
+
+.board::-webkit-scrollbar-thumb {
+  background: var(--ink-faint);
+  border-radius: 100px;
+}
+
+.board::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-soft);
+}
+
+.theme-col {
+  flex: 0 0 300px;
+  width: 300px;
+  /* De kolom in een lichte tint van de themakleur (idee van David, 7
+     november 2026); de kaarten blijven wit, zodat de statuskleuren erop
+     niet met de themakleur botsen. */
+  background: color-mix(in srgb, var(--theme-accent, var(--column-bg)) 16%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--theme-accent, var(--column-border)) 45%, var(--bg));
+  border-top: 4px solid var(--theme-accent, var(--column-border));
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.theme-col__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px 2px;
+  cursor: pointer;
+}
+
+.theme-col__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  flex: 1;
+  color: var(--ink);
+}
+
+.theme-col__count {
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: var(--panel);
+  border-radius: 100px;
+  padding: 1px 8px;
+}
+
+.theme-col__status { padding: 0 4px 8px; }
+
+.theme-col__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-col__add {
+  margin-top: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.empty-col {
+  font-size: 12px;
+  color: var(--ink-faint);
+  padding: 10px 6px;
+  font-style: italic;
+  margin: 0;
+}
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ink-faint);
+  background: var(--panel);
+  border-radius: var(--radius);
+}
+
+.card {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 12px 13px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.card:hover, .card:focus-visible {
+  border-color: var(--canal);
+  outline: none;
+}
+
+.objective-card .card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.card__title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.card__counts {
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+/* Dekking: hoeveel onderliggende items een oordeel hebben. Bewust klein en
+   ingetogen — het kwalificeert de statusbol ernaast, het concurreert er niet
+   mee. Zie ObeyaUI.coverageLabel. */
+.coverage {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.theme-col__status .coverage { margin-left: 6px; }
+
+/* Tekstveld met een knop ernaast (token tonen/verbergen). */
+.input-with-button {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.input-with-button input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Velden die vrijwel nooit wijzigen, uit het zicht maar niet verstopt. */
+details.advanced {
+  margin: 4px 0 12px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 10px;
+}
+
+details.advanced > summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.field-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-top: 6px;
+}
+
+/* ---------- list view ---------- */
+
+.table-wrap { overflow-x: auto; }
+
+.obeya-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.obeya-table thead th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  background: var(--line-soft);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.obeya-table tbody td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+  font-size: 13px;
+}
+
+.obeya-table tbody tr { cursor: pointer; }
+.obeya-table tbody tr:hover { background: #fafbfa; }
+.obeya-table tbody tr:last-child td { border-bottom: none; }
+.obeya-table__title { font-weight: 600; max-width: 320px; }
+
+.mini-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 220px;
+}
+
+.mini-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+}
+
+.mini-list__more { color: var(--ink-faint); font-style: italic; }
+
+/* ---------- matrix view ---------- */
+
+.matrix-wrap {
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  box-shadow: var(--shadow);
+}
+
+.matrix-intro {
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  margin: 0 0 16px;
+  max-width: 680px;
+}
+
+.matrix-mode-toggle {
+  margin-bottom: 14px;
+}
+
+.mcell[role="button"] {
+  cursor: pointer;
+}
+
+.mcell[role="button"]:hover {
+  outline: 2px solid var(--canal);
+  outline-offset: -2px;
+}
+
+/* ---------- tijdlijn ---------- */
+
+.timeline-wrap {
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.timeline-filters {
+  margin-bottom: 16px;
+}
+
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 16px;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--line-soft);
+  cursor: pointer;
+}
+
+.timeline-item:hover { background: var(--panel-soft); }
+.timeline-item:last-child { border-bottom: none; }
+
+.timeline-item__date {
+  flex: 0 0 130px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  padding-top: 2px;
+}
+
+.timeline-item__body { flex: 1; min-width: 0; }
+
+.timeline-item__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+
+.timeline-item__text {
+  margin: 0;
+  font-size: 13.5px;
+}
+
+table.matrix { border-collapse: separate; border-spacing: 8px; }
+table.matrix th { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); padding: 6px 8px; text-align: center; }
+.matrix__rowlabel { text-align: right; padding-right: 14px; max-width: 240px; white-space: nowrap; }
+
+.mcell {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  text-align: center;
+  line-height: 60px;
+  font-size: 14.5px;
+  font-weight: 700;
+  background: rgba(35, 69, 89, var(--mcell-alpha, 0));
+  color: var(--canal-deep);
+}
+
+.mcell--zero { background: var(--line-soft) !important; color: var(--ink-faint); }
+.mcell--diag { background: var(--canal-deep) !important; color: #fff; }
+
+/* ---------- modal ---------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 25, 30, 0.45);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5vh 20px;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.modal {
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  width: 100%;
+  max-width: 640px;
+  box-shadow: var(--shadow-modal);
+  position: relative;
+}
+
+.modal__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 16px;
+}
+
+.modal__title {
+  margin: 4px 34px 10px 0;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.modal__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.modal__description {
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  margin: 0 0 14px;
+}
+
+.modal__subtitle {
+  font-size: 13px;
+  margin: 18px 0 8px;
+}
+
+.rollup-hint {
+  font-size: 12px;
+  margin: 0 0 12px;
+}
+
+.crumbs {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  margin-bottom: 6px;
+}
+
+.crumbs__link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--canal);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11.5px;
+  text-decoration: underline;
+}
+
+.crumbs__sep { margin: 0 4px; }
+.crumbs__current { color: var(--ink-faint); }
+
+.theme-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: -4px 0 12px;
+}
+
+.theme-tag {
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: var(--panel-soft);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.quick-controls {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--panel-soft);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.quick-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.quick-controls input[type="text"] {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.modal-section {
+  margin-bottom: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.modal-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.modal-section__head h3 { margin: 0; font-size: 13px; }
+
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-list__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  background: var(--panel-soft);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.item-list__row:hover { background: var(--line-soft); }
+
+.item-list__name { flex: 1; min-width: 140px; }
+.item-list__extra { font-size: 11px; }
+
+/* Relatie tussen een project en het/de meetbare resultaten waaraan het
+   bijdraagt (veel-op-veel, zie measurableResultIds) — een label per rij
+   i.p.v. structureel nesten, want de relatie is niet 1-op-1 en soms nog
+   niet gelegd. Zie ROADMAP.md ideeën 38/41. */
+.relation-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.relation-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: var(--panel-soft);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.relation-tag--unmapped { background: var(--amber-bg); color: var(--amber); font-weight: 600; }
+.relation-tag--muted { background: var(--grey-bg); color: var(--grey); font-style: italic; }
+
+/* Eén-klik markeren voor het volgende overleg (idee 26) */
+/* Uit: grijs en vaag. Aan: in kleur, op een gevuld rondje met een rand. Zo
+   is het verschil ook zonder kleurzien te zien (vorm en contrast). */
+.flag-btn { filter: grayscale(1) brightness(0.85); border: 1px solid transparent; border-radius: 50%; }
+.flag-btn:hover { filter: none; color: inherit; background: var(--panel-soft); }
+.flag-btn--active, .flag-btn--active:hover { filter: none; opacity: 1; background: var(--amber-bg); border-color: var(--amber); }
+.card__flag { margin-left: auto; font-size: 16px; min-width: 32px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center; }
+/* Op een aanraakscherm een klikvlak van 44 px, zonder dat de kaart groeit. */
+@media (pointer: coarse) { .card__flag { min-width: 44px; min-height: 44px; margin: -6px -6px -6px auto; } }
+.flag-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 2px 12px 2px 10px; border: 1px dashed var(--line); border-radius: 16px; background: var(--panel); font: inherit; font-size: 13px; color: var(--ink-soft); cursor: pointer; }
+.flag-toggle .flag-toggle__icon { filter: grayscale(1); opacity: 0.5; }
+.flag-toggle:hover { border-color: var(--amber); color: var(--ink); }
+.flag-toggle--on { border: 1px solid var(--amber); background: var(--amber-bg); color: var(--amber); font-weight: 700; }
+.flag-toggle--on .flag-toggle__icon { filter: none; opacity: 1; }
+@media (pointer: coarse) { .flag-toggle { min-height: 44px; } }
+
+.callout {
+  background: var(--panel-soft);
+  border-left: 3px solid var(--amber-accent);
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 14px;
+}
+
+.callout--version {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+  font-size: 13px;
+  margin: 0 0 14px;
+}
+
+.detail-grid dt { color: var(--ink-soft); font-weight: 600; }
+.detail-grid dd { margin: 0; }
+
+/* Meetbare resultaten als deelproduct: "Te laat" als tekst met symbool, in
+   een rustig kader (geen kleur alleen); "Klaar als" op één regel. */
+.late-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 1px 8px; border: 1px solid var(--red); border-radius: 999px; color: var(--red); white-space: nowrap; }
+.done-criterion { margin: 2px 0 0; font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.note-list {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.note-list__item {
+  background: var(--panel-soft);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.note-list__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 11.5px;
+}
+
+.note-list__head .muted { margin-left: auto; }
+
+.note-list__text {
+  margin: 0;
+  font-size: 13px;
+}
+
+.note-type {
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: var(--grey-bg);
+  color: var(--grey);
+}
+
+.note-type--obstacle { background: var(--red-bg); color: var(--red); }
+.note-type--countermeasure, .note-type--decision { background: var(--amber-bg); color: var(--amber); }
+.note-type--success { background: var(--green-bg); color: var(--green); }
+.note-type--monitoring, .note-type--question, .note-type--update { background: #e4eaf0; color: var(--canal); }
+.note-type--learning { background: #ece4f5; color: #6b3fa0; }
+
+.note-form {
+  display: grid;
+  grid-template-columns: auto 130px 1fr auto;
+  gap: 6px;
+}
+
+.note-form--edit {
+  grid-template-columns: auto 130px 1fr auto auto;
+  margin-bottom: 8px;
+}
+
+.note-form select, .note-form input {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+/* Koppelformulier onder "Draagt bij aan" / "Hangt samen met" op een
+   detailscherm — zie relationsSection in js/modal.js en
+   docs/relatiemodel-voorstel.md. */
+.relation-form {
+  display: grid;
+  grid-template-columns: 1fr 180px auto;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.relation-form select, .relation-form input {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  /* Een select/input in een grid-cel is standaard niet smaller dan zijn
+     inhoud (min-width: auto) — bij een lange projectnaam in de optielijst
+     duwde dat de hele koppelformulier-rij breder dan de modal. */
+  min-width: 0;
+  width: 100%;
+}
+
+/* Zoekveld boven de keuzelijst: een eigen rij over de volle breedte. */
+.relation-form .relation-form__filter { grid-column: 1 / -1; }
+
+.owner-add-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.owner-add-form input {
+  flex: 1;
+  font: inherit;
+  font-size: 12.5px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+/* ---------- forms ---------- */
+
+.field { margin-bottom: 14px; }
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field-row--3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.status-label-group {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 16px 2px;
+  margin: 0 0 14px;
+}
+
+.status-label-group legend {
+  font-weight: 700;
+  font-size: 13px;
+  padding: 0 6px;
+  color: var(--canal-deep);
+}
+
+.status-label-row {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.status-label-group .field label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+}
+
+.field input[type="text"], .field input[type="date"], .field input[type="number"], .field textarea, .field select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ink);
+  resize: vertical;
+}
+
+.field textarea { min-height: 56px; }
+
+.field--checkbox { display: flex; align-items: flex-end; padding-bottom: 6px; }
+.field--checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: none;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
+.field-hint {
+  /* 13px in --ink-soft: leesbaar en ≥ 4,5:1 contrast (review UX-designer). */
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  margin: 6px 0 0;
+}
+
+.theme-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.theme-opt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 100px;
+  border: 1.5px solid var(--line);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.theme-opt:has(input:checked) {
+  border-color: var(--canal);
+  color: var(--canal-deep);
+  background: #eaf1f4;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.modal-actions__right {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.error-text { color: var(--red); }
+
+.fatal-error {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--red);
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+/* De uitleg en de herstelknop moeten leesbaar blijven; alleen de kop draagt
+   de foutkleur. */
+.fatal-error p {
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.fatal-error .btn {
+  margin-top: 8px;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 860px) {
+  #app { padding: 14px; }
+  .board { flex-direction: column; }
+  .theme-col { width: 100%; }
+  .field-row, .field-row--3 { grid-template-columns: 1fr; }
+  .note-form { grid-template-columns: 1fr; }
+  .relation-form { grid-template-columns: 1fr; }
+  .modal { padding: 20px; }
+  /* Op een telefoon: het bord zo hoog mogelijk (idee 55). De tabbladen in één
+     regel die je zijwaarts schuift in plaats van de pagina breder te maken;
+     visie en herkomst staan in Samenhang en onder Meer. */
+  .app-header__title { font-size: 20px; }
+  .app-header__vision, .app-header .save-indicator { display: none; }
+  .app-bar { flex-wrap: nowrap; flex-direction: column; align-items: stretch; }
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tab { white-space: nowrap; }
+  .app-bar .toolbar { margin-left: 0; justify-content: flex-start; }
+}
+
+/* ---------- accessibility ---------- */
+
+:focus-visible {
+  outline: 2px solid var(--canal);
+  outline-offset: 2px;
+}
+
+/* ---------- kamer-modus (presentatiemodus) ----------
+   Digitale benadering van "de fysieke Obeya-ruimte binnenlopen": chrome-loos
+   en vergroot, bedoeld om van een afstand op een vergaderscherm te lezen
+   in plaats van van dichtbij te bedienen. Toegevoegd als klasse op <body>
+   door js/app.js (zie ObeyaState.isPresentationMode()). */
+
+/* Van de filters blijft alleen de rij actieve filters: wie naar het scherm
+   kijkt, moet zien dat er iets is weggefilterd. Van de werkbalk alleen de
+   groep Weergave (kamermodus en beoordelingsronde). */
+body.presentation-mode .filter-toggle,
+body.presentation-mode #filter-search,
+body.presentation-mode .filter-panel,
+body.presentation-mode .app-bar .toolbar__group:not(:first-child),
+body.presentation-mode .app-header__vision,
+body.presentation-mode .save-indicator,
+body.presentation-mode .toolbar .btn:not([data-action="toggle-presentation"]):not([data-action="open-review"]),
+body.presentation-mode #import-file {
+  display: none;
+}
+
+body.presentation-mode .toggle-presentation,
+body.presentation-mode [data-action="toggle-presentation"] {
+  background: var(--canal-deep);
+  color: #fff;
+  border-color: var(--canal-deep);
+}
+
+body.presentation-mode .app-header__title { font-size: 32px; }
+body.presentation-mode .app-header__sub { font-size: 14px; }
+
+body.presentation-mode .theme-col { flex-basis: 340px; width: 340px; padding: 16px; }
+body.presentation-mode .theme-col__title { font-size: 17px; }
+body.presentation-mode .card__title { font-size: 15px; }
+body.presentation-mode .status-pill { font-size: 12.5px; }
+body.presentation-mode .tabs { font-size: 15px; }
+
+/* Samenvoegen met het team (js/merge.js, docs/samenvoegen.md): één blok per
+   botsing, met de twee versies als keuzerondjes onder elkaar. */
+.merge-form { display: grid; gap: 10px; }
+.merge-form__all { display: flex; flex-wrap: wrap; gap: 6px; }
+.merge-conflict { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; margin: 0; display: grid; gap: 6px; }
+.merge-conflict legend { font-weight: 600; padding: 0 4px; }
+.merge-conflict__option { display: flex; gap: 8px; align-items: baseline; cursor: pointer; }
+.merge-conflict__option span { overflow-wrap: anywhere; }
+.git-unshared { color: var(--amber); font-weight: 600; }
+.git-notice:empty { display: none; }
+
+/* ---------- Samenhang (canvas) ----------
+   js/canvas.js, docs/canvas-voorstel.md. Kaarten zijn HTML in een vaste
+   indeling; de lijnen liggen als SVG eronder (z-index 0) en lopen dus
+   achter de kaarten langs tot aan hun rand. */
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.canvas { display: grid; gap: 10px; }
+.canvas-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; font-size: 13px; }
+.canvas-controls__group { display: inline-flex; align-items: center; gap: 6px; }
+.canvas-controls__group select { font: inherit; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--line); }
+.canvas-controls__zoom { display: inline-flex; align-items: center; gap: 4px; }
+.canvas-controls__pct { min-width: 3.2em; text-align: center; font-variant-numeric: tabular-nums; }
+.canvas-controls__focus { display: inline-flex; align-items: center; gap: 6px; }
+.canvas-legend { display: inline-flex; flex-wrap: wrap; gap: 12px; margin-left: auto; color: var(--ink-soft); }
+.canvas-legend__item { display: inline-flex; align-items: center; gap: 6px; }
+.canvas-legend__line { display: inline-block; width: 22px; border-top: 2px solid var(--ink-faint); }
+.canvas-legend__line--dashed { border-top-style: dashed; border-color: var(--amber); }
+
+.canvas-viewport {
+  overflow: auto;
+  max-height: calc(100vh - 230px);
+  min-height: 360px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background-color: var(--panel-soft);
+  background-image: radial-gradient(var(--line) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+.canvas-sizer { position: relative; }
+.canvas-stage {
+  position: absolute; top: 0; left: 0;
+  transform-origin: 0 0;
+  padding: 18px;
+  display: grid; gap: 22px; align-content: start;
+  box-sizing: border-box;
+  /* De breedte zet drawConnections() op de breedte van het venster (gedeeld
+     door de zoomfactor), zodat de inhoud daarbinnen doorloopt naar een
+     volgende rij in plaats van opzij weg te lopen. */
+  width: 100%;
+}
+.canvas-links { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; overflow: visible; }
+
+.cv-link { fill: none; stroke: var(--ink-faint); stroke-width: 1.6; opacity: .75; }
+.cv-link--unlinked { stroke: var(--amber); stroke-dasharray: 6 5; }
+.cv-link--related { stroke-dasharray: 2 5; }
+.cv-link--also-theme { stroke-dasharray: 6 5; }
+.has-focus .cv-link { opacity: .12; }
+.has-focus .cv-link.is-chain { opacity: 1; stroke: var(--canal); stroke-width: 2.6; }
+
+.cv-vision {
+  position: relative; z-index: 1;
+  background: var(--canal); color: #fff;
+  border-radius: var(--radius); padding: 12px 18px; max-width: 900px;
+}
+.cv-vision__label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .8; }
+.cv-vision p { margin: 2px 0 0; font-size: 15px; line-height: 1.45; }
+
+.cv-themes, .cv-groups, .cv-worklanes { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+.cv-worklanes { margin-top: 70px; }
+.cv-theme, .cv-group { display: grid; gap: 10px; align-content: start; }
+.cv-theme { flex: 1 1 280px; min-width: 280px; }
+.cv-theme__head, .cv-group__head {
+  position: relative; z-index: 1;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  background: var(--panel); border-top: 4px solid var(--theme-color, var(--canal));
+  border-radius: var(--radius-sm); padding: 8px 10px; margin: 0;
+  font-size: 14px; font-weight: 600;
+}
+.cv-theme__status { display: inline-flex; flex-wrap: wrap; gap: 4px; width: 100%; font-weight: 400; }
+.cv-theme__body { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; align-items: start; }
+.cv-lanes { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+.cv-group { max-width: 100%; }
+.cv-lane { width: 270px; display: grid; gap: 12px; align-content: start; }
+.cv-lane__work { display: grid; gap: 10px; margin-top: 34px; }
+.cv-lane__work:empty { display: none; }
+.cv-lane--work .cv-lane__work { margin-top: 0; }
+.cv-lane__head { position: relative; z-index: 1; margin: 0; font-size: 14px; display: flex; align-items: center; gap: 6px; background: var(--panel); border-radius: var(--radius-sm); padding: 6px 10px; }
+
+.cv-card {
+  position: relative; z-index: 1;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 9px 10px;
+  display: grid; gap: 6px; font-size: 13px;
+  box-shadow: var(--shadow);
+}
+.cv-objective { border-left: 4px solid var(--theme-color, var(--canal)); }
+.cv-objective--gap { border-style: dashed; border-left-style: solid; }
+.cv-work--unlinked { border-style: dashed; border-color: var(--amber); }
+.cv-card__head { display: flex; align-items: flex-start; gap: 6px; }
+.cv-card__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.cv-card__foot { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; }
+.cv-card__buttons { display: inline-flex; gap: 4px; }
+.cv-also, .cv-context { margin: 0; font-size: 12px; }
+
+.cv-focus {
+  font: inherit; color: inherit; text-align: left; background: none; border: 0; padding: 0;
+  cursor: pointer; overflow-wrap: anywhere;
+}
+.cv-focus:hover { text-decoration: underline; }
+.cv-focus[aria-pressed="true"] { text-decoration: underline; text-decoration-thickness: 2px; color: var(--canal); }
+.cv-card__title, .cv-theme__title { font-weight: 600; }
+
+.cv-mrs, .cv-actions { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+/* Statuslabel en markering op de eerste regel, de naam eronder over de volle
+   breedte. Naast elkaar op één regel kreeg een lange naam maar een smalle
+   strook en brak hij na elk woord af. */
+.cv-mr, .cv-action {
+  display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2px 6px;
+  padding: 4px 6px; border-radius: 4px; background: var(--panel-soft);
+}
+.cv-mr > .status-pill, .cv-action > .status-pill { grid-row: 1; grid-column: 1; justify-self: start; }
+.cv-mr > .cv-tag, .cv-action > .muted { grid-row: 1; grid-column: 2; justify-self: end; }
+.cv-mr__name, .cv-action__name { grid-row: 2; grid-column: 1 / -1; min-width: 0; font-size: 12.5px; }
+.cv-mr--nowork .cv-mr__name { color: var(--ink-soft); }
+.cv-tag { font-size: 11px; white-space: nowrap; }
+.cv-tag--gap { color: var(--amber); font-weight: 600; }
+.cv-gap-line { margin: 0; padding: 6px; border: 1px dashed var(--amber); border-radius: 4px; text-align: center; }
+
+.has-focus .is-dimmed { opacity: .32; }
+.has-focus .cv-card.is-chain, .has-focus .cv-theme__head.is-chain { box-shadow: 0 0 0 2px var(--canal), var(--shadow); }
+.has-focus .cv-mr.is-chain, .has-focus .cv-action.is-chain { background: #dceaf2; }
+
+body.presentation-mode .canvas-viewport { max-height: calc(100vh - 150px); }
+body.presentation-mode .cv-card { font-size: 14.5px; }
+body.presentation-mode .cv-mr__name, body.presentation-mode .cv-action__name { font-size: 14px; }
+body.presentation-mode .cv-theme { min-width: 320px; flex-basis: 320px; }
+body.presentation-mode .cv-lane { width: 320px; }
+body.presentation-mode .cv-vision p { font-size: 18px; }
+.canvas-viewport { cursor: grab; }
+.canvas-viewport.is-panning { cursor: grabbing; user-select: none; }
+.canvas-viewport .cv-card, .canvas-viewport .cv-theme__head { cursor: auto; }
+
+/* Keten: thema → doel → meetbaar resultaat → project → actie, van links naar
+   rechts. Elk project staat naast het resultaat waar het aan bijdraagt, elk
+   resultaat naast zijn doel, elk doel naast zijn thema; de lijnen lopen
+   horizontaal tussen de kolommen. */
+.kt-header, .kt-band { display: grid; grid-template-columns: 190px 1fr; gap: 0 48px; }
+.kt-header {
+  grid-template-columns: 190px 260px 240px 250px 230px; column-gap: 48px;
+  font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft);
+  position: relative; z-index: 1;
+}
+.kt-band { position: relative; padding: 14px 0; border-top: 3px solid var(--theme-color, var(--line)); }
+.kt-doelen { display: grid; gap: 26px; }
+.kt-doel { display: grid; grid-template-columns: 260px 1fr; gap: 0 48px; align-items: start; }
+.kt-mrgroups { display: grid; gap: 16px; }
+.kt-mrgroup { display: grid; grid-template-columns: 240px 1fr; gap: 0 48px; align-items: start; }
+.kt-rows { display: grid; gap: 12px; }
+.kt-row { display: grid; grid-template-columns: 250px 230px; gap: 0 48px; align-items: start; }
+.kt-cell--actions { display: grid; gap: 8px; }
+.kt-cell--theme { position: sticky; top: 0; align-self: start; }
+.kt-none { margin: 0; font-size: 12.5px; color: var(--ink-soft); font-style: italic; position: relative; z-index: 1; }
+.kt-gap__add { display: block; margin: 6px auto 0; }
+.kt-gap { margin: 0; padding: 8px; border: 1px dashed var(--amber); border-radius: 4px; color: var(--amber); font-weight: 600; font-size: 12.5px; text-align: center; background: var(--panel); position: relative; z-index: 1; }
+.cv-mrcard--nowork { border-style: dashed; border-color: var(--amber); }
+.cv-stand { font-weight: 600; font-variant-numeric: tabular-nums; }
+.cv-due { font-size: 12px; color: var(--ink-soft); }
+.cv-mr__value { grid-row: 3; grid-column: 1 / -1; font-variant-numeric: tabular-nums; font-weight: 600; }
+.cv-link--tree { stroke: var(--ink-faint); }
+
+/* ---------- Muurvellen (js/print.js, docs/muurvellen.md) ----------
+   Vellen in millimeters, zodat de indeling op het scherm (waar ze buiten
+   beeld worden klaargezet en gemeten) gelijk is aan die op papier. --k
+   schaalt de letters mee met het formaat (A1 = 1). */
+
+#print-root { position: absolute; left: -200000px; top: 0; }
+.print-doc { width: var(--page-w); font-size: calc(var(--k) * 12pt); color: #111; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet { width: var(--page-w); box-sizing: border-box; display: flex; flex-direction: column; gap: calc(var(--k) * 6mm); background: #fff; }
+.sheet--page { height: var(--page-h); overflow: hidden; break-after: page; }
+.sheet--flow { break-after: page; }
+.sheet:last-child { break-after: auto; }
+/* Mozaïek: een A1-muurvel over vier A3's (js/print.js, tegels). Elk deel is
+   een venster op hetzelfde vel; de stippellijn markeert de rand die tegen een
+   ander deel komt. */
+/* Het document is zo breed als één deel, niet als het hele A1-vel; anders verkleint de browser alles. */
+.print-doc--tiles { width: auto; }
+.tile-page { position: relative; overflow: clip; contain: strict; break-after: page; break-inside: avoid; background: #fff; }
+.tile-page:last-child { break-after: auto; }
+.tile-content { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.tile-content .sheet { break-after: auto; }
+.tile-cut { position: absolute; z-index: 2; border: 0 dashed #666; }
+.tile-cut--right { top: 0; bottom: 0; right: 0; border-right-width: .35mm; }
+.tile-cut--left { top: 0; bottom: 0; left: 0; border-left-width: .35mm; }
+.tile-cut--bottom { left: 0; right: 0; bottom: 0; border-bottom-width: .35mm; }
+.tile-cut--top { left: 0; right: 0; top: 0; border-top-width: .35mm; }
+.tile-label { position: absolute; z-index: 2; font: 600 8pt/1.2 system-ui, sans-serif; color: #444; background: rgba(255, 255, 255, .85); padding: .6mm 1.5mm; border-radius: 1mm; }
+.tile-label--top-left { top: 1mm; left: 1mm; }
+.tile-label--top-right { top: 1mm; right: 1mm; }
+.tile-label--bottom-left { bottom: 1mm; left: 1mm; }
+.tile-label--bottom-right { bottom: 1mm; right: 1mm; }
+.sheet__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10mm; border-bottom: calc(var(--k) * 1.2mm) solid #234559; padding-bottom: calc(var(--k) * 3mm); }
+.sheet__board { margin: 0; font-size: 1.1em; color: #555; }
+.sheet__title { margin: 0; font-size: 2.8em; line-height: 1.1; }
+.sheet__sub { margin: .3em 0 0; font-size: 1.15em; color: #444; }
+.sheet__dates { text-align: right; font-size: 1.05em; }
+.sheet__dates p { margin: 0; }
+.sheet__body { flex: 1; min-height: 0; overflow: hidden; position: relative; }
+.sheet__legend { margin: 0; display: flex; flex-wrap: wrap; gap: .4em 1.2em; font-size: .95em; color: #333; }
+
+.pm { display: inline-flex; align-items: center; gap: .3em; font-weight: 600; white-space: nowrap; padding: .05em .45em; border-radius: 1em; }
+.pm__sym { font-weight: 700; }
+.pm--green { color: #1f5f39; background: #e4f3e9; }
+.pm--amber { color: #7a4f0d; background: #faf0dc; }
+.pm--red { color: #8c2f22; background: #fbe8e4; }
+.pm--grey { color: #3d4a50; background: #eceff0; }
+.pm--blue { color: #1f4f78; background: #e2eef7; }
+.pm--done { color: #1f5f39; background: #e4f3e9; }
+
+/* ---------- Teamplan als presentatie (js/deck.js) ----------
+   Dia's van 16:9 (338,67 × 190,5 mm), letters via --k zoals de muurvellen. */
+.deck .slide { width: var(--page-w); height: var(--page-h); box-sizing: border-box; padding: 14mm 16mm 10mm; display: flex; flex-direction: column; gap: 5mm; overflow: hidden; break-after: page; background: #fff; position: relative; }
+.deck .slide:last-child { break-after: auto; }
+.slide__foot { margin-top: auto; display: flex; justify-content: space-between; font-size: .95em; color: #5a6672; border-top: 1px solid #d5dbe0; padding-top: 2.5mm; }
+.deck .slide--title { background: #14263a; color: #fff; justify-content: center; }
+.slide--title .slide__foot { color: #b8c4d0; border-top-color: rgba(255, 255, 255, .25); }
+.slide__title-block { margin: auto 0; }
+.slide__kicker { margin: 0; font-size: 1.6em; text-transform: uppercase; letter-spacing: .12em; color: #b8c4d0; }
+.slide__title { margin: .2em 0; font-family: Georgia, "Iowan Old Style", serif; font-size: 4em; line-height: 1.1; }
+.slide__sub { margin: 0; font-size: 1.5em; color: #dfe6ec; }
+.slide__heading { margin: 0; font-size: 2.6em; line-height: 1.15; color: #14263a; }
+.slide__heading span { font-weight: 400; color: #5a6672; font-size: .7em; }
+.slide--theme { border-top: 4mm solid var(--theme-color, #234559); }
+.slide__vision { margin: 0; padding: .4em .8em; border-left: .3em solid #c98a2b; font-size: 1.7em; line-height: 1.35; color: #2b3a48; }
+.slide__principles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5mm; }
+.slide__principles li { display: grid; gap: .3em; padding: .8em 1em; background: #f4f2ec; border-radius: 2mm; font-size: 1.15em; }
+.slide__principles strong { font-size: 1.4em; color: #14263a; }
+.slide__principles em { font-style: normal; color: #5a6672; }
+.slide__themes { display: grid; gap: 5mm; align-items: start; }
+.slide__theme { background: color-mix(in srgb, var(--theme-color) 12%, #fff); border-radius: 2mm; overflow: hidden; }
+.slide__theme h3 { margin: 0; padding: .5em .7em; background: var(--theme-color); color: var(--theme-ink); font-size: 1.35em; line-height: 1.2; }
+.slide__theme ul { list-style: none; margin: 0; padding: .5em .7em .7em; display: grid; gap: .45em; font-size: 1.05em; }
+.slide__theme li { display: grid; gap: .2em; }
+.slide__goals { display: grid; gap: 4mm; align-content: start; }
+.slide__goal header { display: flex; align-items: baseline; justify-content: space-between; gap: 1em; border-bottom: 2px solid var(--theme-color, #234559); padding-bottom: .2em; }
+.slide__goal h3 { margin: 0; font-size: 1.6em; line-height: 1.2; }
+.slide__goal ul { list-style: none; margin: .3em 0 0; padding: 0; display: grid; gap: .25em; }
+.slide__item { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) auto; gap: 1em; align-items: baseline; font-size: 1.3em; }
+.slide__type { font-size: .8em; text-transform: uppercase; letter-spacing: .06em; color: #5a6672; }
+.slide__name small { display: block; color: #5a6672; font-size: .85em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slide__meta { display: inline-flex; align-items: center; gap: .6em; white-space: nowrap; font-size: .95em; }
+.slide__noowner { font-style: italic; color: #8a6d00; }
+.slide__late { color: #9b1c1c; text-decoration: underline; }
+.slide__more { color: #5a6672; font-style: italic; }
+.slide__table { width: 100%; border-collapse: collapse; font-size: 1.1em; }
+.slide__table th { text-align: left; font-size: .85em; text-transform: uppercase; letter-spacing: .06em; color: #5a6672; border-bottom: 2px solid #14263a; padding: .3em .5em; }
+.slide__table td { border-bottom: 1px solid #d5dbe0; padding: .45em .5em; vertical-align: top; }
+.slide__swatch { display: inline-block; width: .7em; height: .7em; border-radius: 50%; margin-right: .5em; }
+.slide__empty { font-size: 1.5em; color: #5a6672; }
+
+/* ---------- Hoofdbalk (ontwerp UX-designer, 12 okt 2026) ----------
+   Donkere balk met teamnaam en versie, rechts de status van het team,
+   Afdrukken en Instellingen; daaronder de visie met de peildatum. */
+.app-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 48px; margin: -12px -24px 0; padding: 4px 24px; background: #14263a; color: #fff; }
+.app-topbar__brand { display: flex; flex-direction: column; min-width: 0; }
+.app-topbar__version { font-size: 11px; font-weight: 500; color: #b8c4d0; line-height: 1.1; letter-spacing: .02em; }
+.app-topbar .app-header__title { color: #fff; font-size: 20px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-topbar__actions { display: flex; align-items: center; gap: 8px; flex: none; }
+.app-topbar :focus-visible { outline: 2px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 4px #14263a; }
+.topbar-btn { font: inherit; font-size: 13px; font-weight: 600; min-height: 32px; padding: 0 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, .35); background: transparent; color: #fff; cursor: pointer; white-space: nowrap; }
+.topbar-btn:hover { background: rgba(255, 255, 255, .12); }
+.topbar-btn:disabled { opacity: .5; cursor: default; }
+.topbar-btn--strong { background: #ffe9b8; color: #6b4300; border-color: #ffe9b8; }
+.topbar-btn--icon { display: inline-grid; place-items: center; width: 36px; min-height: 36px; padding: 0; border-color: transparent; }
+.topbar-btn--icon:hover { background: rgba(255, 255, 255, .14); }
+.topbar-btn--icon.topbar-btn--strong:hover { background: #ffdc8f; }
+.app-visionbar { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding-top: 4px; }
+.app-visionbar .app-header__vision { margin: 0; min-width: 0; font-size: 14px; color: #2b3a48; }
+.app-visionbar__date { margin: 0; flex: none; font-size: 13px; color: #5a6672; }
+
+.team-status { position: relative; display: flex; align-items: center; gap: 8px; }
+.team-status__menu > summary { list-style: none; }
+.team-status__menu > summary::-webkit-details-marker { display: none; }
+.team-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border-radius: 16px; font-size: 13px; font-weight: 600; cursor: pointer; background: rgba(255, 255, 255, .12); color: #fff; border: 1px solid rgba(255, 255, 255, .35); white-space: nowrap; }
+.team-chip__sym { font-size: 14px; }
+.team-chip__repo { font-weight: 500; color: #b8c4d0; }
+.team-chip__who { font-weight: 700; padding-right: 6px; border-right: 1px solid currentColor; }
+
+/* Rollen (Instellingen → Rollen, en per persoon in Eigenaren). */
+.item-list__row--person { flex-wrap: wrap; }
+.item-list__roles { flex-basis: 100%; order: 3; font-size: 13px; color: var(--ink-soft); }
+.person-form { flex-basis: 100%; order: 4; display: grid; gap: 10px; padding: 12px; margin-top: 6px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--panel-soft); }
+.person-form__roles { border: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 12px; }
+.person-form__roles legend { font-weight: 700; margin-bottom: 6px; }
+.person-form__field { display: grid; gap: 4px; font-size: 14px; font-weight: 600; }
+.person-form__field .muted { font-weight: 400; }
+.person-form__field input { max-width: 280px; min-height: 32px; }
+.person-form__actions { display: flex; gap: 8px; }
+.role-list__confirm { white-space: nowrap; }
+.settings__warning { color: var(--red); font-weight: 600; }
+.me-field { margin-bottom: 18px; }
+/* Eigenaar en betrokkenen als knop in de kopregel van een detailscherm
+   (idee 74): de waarde is de knop, eronder klapt een paneel open. */
+.value-chip { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 2px 10px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); font: inherit; font-size: 13px; color: var(--ink); cursor: pointer; }
+.value-chip:hover { border-color: var(--canal); }
+.value-chip[aria-expanded="true"] { border-color: var(--canal); background: var(--panel-soft); }
+.value-chip__label { color: var(--ink-soft); }
+.value-chip--empty span:not(.value-chip__label):not(.value-chip__caret) { color: var(--ink-soft); font-style: italic; }
+.value-chip__caret { font-size: 10px; color: var(--ink-soft); }
+.value-chip--status .status-dot { margin-left: 2px; background: currentColor; }
+.value-chip--status .value-chip__label, .value-chip--status .value-chip__caret { color: inherit; }
+.value-chip.status-green, .value-chip.status-done { background: var(--green-bg); color: var(--green); }
+.value-chip.status-amber { background: var(--amber-bg); color: var(--amber); }
+.value-chip.status-red { background: var(--red-bg); color: var(--red); }
+.value-chip.status-grey { background: var(--grey-bg); color: var(--grey); }
+.value-chip.status-blue { background: var(--blue-bg); color: var(--blue); }
+.chip-panel .status-select { min-width: 240px; min-height: 36px; }
+.chip-panel { margin: 8px 0 4px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--panel-soft); display: grid; gap: 8px; justify-items: start; }
+.chip-panel label { font-size: 13px; font-weight: 600; }
+.chip-panel .owner-select { min-width: 240px; min-height: 36px; }
+.chip-panel .involved-picker { border: none; padding: 0; margin: 0; width: 100%; }
+.chip-panel .involved-picker legend, .chip-panel .involved-picker__summary { display: none; }
+.chip-panel .involved-picker { max-height: 320px; overflow-y: auto; }
+@media (pointer: coarse) { .value-chip, .chip-panel select { min-height: 44px; } }
+
+/* Te bevestigen (stap 3 van het wijzigingslog): neutraal, donkere rand,
+   geen statuskleur, altijd tekst (advies UX-designer). */
+.pending-badge { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; border: 1.5px solid var(--ink); border-radius: 10px; background: var(--panel); color: var(--ink); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.confirm-block { border: 1px solid var(--line); border-left: 4px solid var(--canal); border-radius: var(--radius-sm); padding: 12px 16px; background: var(--panel); margin-bottom: 16px; }
+.confirm-block__who { margin: 4px 0 10px; font-size: 14px; color: var(--ink-soft); }
+.confirm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.confirm-row { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 6px; }
+.confirm-row:first-child { border-top: none; padding-top: 0; }
+.confirm-row__what { margin: 0; }
+.confirm-row__items { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; }
+.confirm-item { background: none; border: none; padding: 0; font: inherit; color: var(--canal); text-decoration: underline; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.confirm-item--gone { color: var(--ink-soft); text-decoration: line-through; cursor: default; }
+.confirm-row__buttons, .confirm-reject__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.confirm-row__buttons .btn[aria-disabled="true"] { background: #e4e9eb; color: #5a6b73; border-color: #c9d2d6; cursor: not-allowed; }
+.pending-badge--rejected { border-style: dashed; }
+.confirm-block__sub { margin: 16px 0 6px; font-size: 14px; }
+.confirm-row__reason { margin: 0; font-size: 14px; }
+.confirm-row__problem { padding: 8px 12px; border-left: 3px solid var(--red); background: var(--red-bg); font-size: 14px; }
+.confirm-row__problem p, .confirm-row__problem ul { margin: 0; }
+.confirm-row__problem ul { padding-left: 18px; }
+.change-tag { display: inline-block; padding: 0 5px; border: 1px solid var(--line); border-radius: 3px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--ink-soft); }
+@media (pointer: coarse) { .confirm-row__buttons .btn, .confirm-reject__actions .btn { min-height: 44px; } }
+.confirm-reject { display: grid; gap: 6px; max-width: 520px; }
+.confirm-reject label { font-size: 13px; font-weight: 600; }
+.confirm-reject textarea { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.confirm-detail { margin: 8px 0; padding: 10px 12px; border: 1px solid var(--line); border-left: 4px solid var(--canal); border-radius: var(--radius-sm); background: var(--panel); }
+
+/* Geschiedenis (stap 5 van het wijzigingslog): per item onderaan het
+   detailscherm, en de wijzigingen in de Tijdlijn. */
+.history__toggle { display: flex; align-items: baseline; gap: 6px; width: 100%; text-align: left; background: none; border: none; padding: 6px 0; font: inherit; color: var(--ink); cursor: pointer; min-height: 32px; }
+.history__toggle:hover strong { text-decoration: underline; }
+.history__caret { width: 1em; color: var(--ink-soft); }
+.history-all { margin: 6px 0 10px; }
+.history-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.history-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); }
+.history-row:first-child { border-top: none; }
+.history-row__date { font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
+.history-row__head { margin: 0; }
+.history-row__lines { margin: 4px 0 0; padding-left: 18px; font-size: 14px; display: grid; gap: 2px; }
+.history-since { list-style: none; display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.history-since::before, .history-since::after { content: ''; flex: 1; border-top: 1px solid #c9d2d6; }
+.timeline-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 8px; }
+.timeline-head .history-all { margin: 0; }
+.meeting-done { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 14px; }
+.meeting-done p { margin: 0; flex: 1 1 320px; color: var(--ink-soft); }
+@media (max-width: 600px) { .history-row { grid-template-columns: 1fr; gap: 2px; } }
+
+/* Eigenaren per rol (Instellingen en de keuzelijst voor betrokkenen). */
+.item-list__group { list-style: none; margin: 14px 0 4px; font-weight: 700; font-size: 14px; color: var(--canal-deep); }
+.item-list__group:first-child { margin-top: 0; }
+.involved-picker__group { margin: 10px 0 4px; font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+/* Rijen in Instellingen (Eigenaren, Rollen): aanraakdoelen van 44 px en
+   leesbare bijschriften (review UX-designer). */
+.settings .item-list__row { min-height: 48px; }
+.settings .item-list__row .icon-btn { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.settings .item-list__extra, .settings .item-list__roles { font-size: 13px; color: var(--ink-soft); }
+.role-list__confirm { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.team-status--unshared .team-chip { background: #ffe9b8; color: #6b4300; border-color: #ffe9b8; }
+.team-status--error .team-chip { background: #f8d7d3; color: #8a1c12; border-color: #f8d7d3; }
+.team-status--busy .team-chip__sym { display: inline-block; animation: draai 1.2s linear infinite; }
+@keyframes draai { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .team-status--busy .team-chip__sym { animation: none; } }
+.team-status__panel { position: absolute; right: 0; top: calc(100% + 8px); z-index: 60; width: 320px; padding: 12px 16px; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); font-size: 13px; }
+.team-status__panel p { margin: 0 0 8px; }
+.team-status__panel .save-indicator { color: var(--ink-soft); }
+.team-status__error { color: var(--red); }
+.team-status__buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.team-status__quick { display: inline-flex; gap: 6px; }
+/* Per breedte: breed alles, laptop de korte chip (+ Delen als er iets te delen
+   is), telefoon alleen het symbool. */
+@media (max-width: 1599px) {
+  .team-chip__repo { display: none; }
+}
+@media (max-width: 640px) {
+  .app-topbar { margin: -14px -14px 0; padding: 4px 14px; }
+  .app-topbar .app-header__title { font-size: 18px; }
+  .team-chip { min-width: 44px; min-height: 44px; justify-content: center; padding: 0; }
+  .team-chip__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .topbar-btn { min-height: 44px; min-width: 44px; }
+  .app-visionbar { display: none; }
+  .team-chip__sym { font-size: 20px; }
+  .team-status__quick { display: none; }
+}
+/* Kamermodus: alleen de naam, groot; de chip alleen als er iets mis is. */
+body.presentation-mode .app-topbar__version,
+body.presentation-mode .topbar-btn,
+body.presentation-mode .team-status--ok, body.presentation-mode .team-status--local, body.presentation-mode .team-status--busy, body.presentation-mode .team-status--notfetched { display: none; }
+body.presentation-mode .app-topbar .app-header__title { font-size: 32px; }
+
+/* ---------- Instellingen (idee 59, ontwerp UX-designer) ----------
+   Eén groot venster: links de onderdelen, rechts het gekozen onderdeel. */
+.modal:has(.settings) { max-width: min(960px, 94vw); padding: 24px 28px 28px; }
+.settings { display: grid; grid-template-columns: 224px minmax(0, 1fr); gap: 0 32px; }
+.settings__nav { display: flex; flex-direction: column; gap: 2px; padding-right: 16px; border-right: 1px solid var(--line); }
+.settings__tab { font: inherit; font-size: 14px; text-align: left; min-height: 44px; padding: 10px 14px; border: 0; border-radius: var(--radius-sm); background: none; color: var(--ink-soft); cursor: pointer; }
+.settings__tab:hover { background: var(--panel-soft); color: var(--ink); }
+.settings__tab[aria-selected="true"] { background: var(--panel-soft); color: var(--ink); font-weight: 700; box-shadow: inset 3px 0 0 var(--canal-deep); }
+.settings__panel { min-width: 0; }
+.settings__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.settings__head h3 { margin: 0; font-size: 20px; line-height: 28px; }
+.settings__scope { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-soft); white-space: nowrap; }
+.settings__scope--browser { border-style: dashed; color: #4a5560; border-color: #8a969c; }
+.settings__notice { margin: 0 0 12px; min-height: 1.2em; font-size: 13px; color: var(--green); font-weight: 600; }
+.settings__notice:empty { margin: 0; min-height: 0; }
+.favicon-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.favicon-choice { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; }
+.favicon-choice--on { border-color: var(--canal-deep); box-shadow: inset 0 0 0 1px var(--canal-deep); }
+.favicon-choice__preview { display: inline-flex; align-items: center; gap: 6px; }
+.favicon-choice__empty { display: inline-grid; place-items: center; width: 32px; height: 32px; border: 1px dashed var(--line); border-radius: 4px; color: var(--ink-faint); }
+.favicon-upload { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; }
+.settings-data { display: grid; gap: 12px; }
+.settings-data__item { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.settings-data__item p { margin: 2px 0 0; font-size: 13px; }
+.settings-data__danger { color: var(--red); border-color: var(--red); }
+.settings-data__item .btn { white-space: nowrap; flex: none; }
+.theme-col--add { background: none; border: 2px dashed var(--column-border); display: flex; align-items: flex-start; justify-content: center; padding: 16px 8px 0; flex-basis: 104px; width: 104px; }
+.theme-col--add .theme-col__add { white-space: nowrap; }
+@media (max-width: 860px) {
+  .settings { grid-template-columns: 1fr; min-height: 0; }
+  .settings__nav { flex-direction: row; overflow-x: auto; padding: 0 0 8px; margin-bottom: 12px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .settings__tab { white-space: nowrap; }
+  .settings__tab[aria-selected="true"] { box-shadow: inset 0 -3px 0 var(--canal-deep); }
+  .theme-col--add { width: 100%; }
+}
+.print-form__presets { margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--ink-soft); }
+
+.canvas-stage--print { position: relative; width: max-content; padding: 0; display: grid; gap: 16px; }
+
+.pt-fields { margin: 0; font-size: 1.15em; display: flex; gap: 1em; align-items: flex-end; }
+.pt-line { display: inline-block; width: 60mm; border-bottom: 1px solid #333; height: 1.2em; }
+.pt-line--long { width: 160mm; }
+/* Het vakje dat de Builder afvinkt als het sessievel in de app staat. */
+.pt-processed { margin-top: 0.8em; }
+.pt-box { display: inline-block; width: 1em; height: 1em; border: 2px solid #333; }
+.pt-table { width: 100%; border-collapse: collapse; font-size: 1em; }
+.pt-table thead { display: table-header-group; }
+.pt-table th { text-align: left; background: #234559; color: #fff; padding: .45em .5em; font-size: .95em; }
+.pt-table td { border: 1px solid #9aa7ad; padding: .45em .5em; vertical-align: top; height: calc(var(--k) * 16mm); }
+.pt-table tr { break-inside: avoid; }
+.pt-col-item { width: 22%; }
+.pt-col-write { width: 20%; }
+.pt-col-check { width: 3%; text-align: center; }
+.pt-box { display: inline-block; width: 1.2em; height: 1.2em; border: 2px solid #333; line-height: 1.1; text-align: center; }
+.pt-type { font-size: .8em; text-transform: uppercase; letter-spacing: .05em; color: #555; }
+.pt-context { font-size: .85em; color: #555; }
+.pt-late { color: #8c2f22; }
+
+@media print {
+  html, body { background: #fff !important; margin: 0; }
+  body.is-printing > *:not(#print-root) { display: none !important; }
+  body.is-printing #print-root { position: static; left: auto; }
+}
+
+
+/* ---------- De muur: lens Keten als muur met geeltjes ----------
+   Kleur = soort briefje (instelbaar, zie "Weergave van de muur"), niet de
+   status: die staat als label met tekst op elk briefje. Een vaste, kleine
+   scheefstand per briefje; elk thema een eigen muurvlak; dunne lijnen tussen
+   de kolommen. */
+.canvas--chain .cv-sticky {
+  background: var(--sticky, var(--panel));
+  border: 0;
+  border-radius: 2px;
+  box-shadow: 0 1px 1px rgba(20, 30, 35, .10), 0 4px 10px rgba(20, 30, 35, .10);
+  transform: rotate(var(--tilt, 0deg));
+}
+.canvas--chain .cv-sticky::after {
+  /* een stukje plakband bovenaan */
+  content: ""; position: absolute; top: -7px; left: 50%; width: 46px; height: 14px; margin-left: -23px;
+  background: rgba(255, 255, 255, .55); border: 1px solid rgba(0, 0, 0, .05); transform: rotate(calc(var(--tilt, 0deg) * -2));
+}
+.canvas--chain .cv-objective.cv-sticky { border-left: 6px solid var(--theme-color, var(--canal)); }
+.canvas--chain .cv-mrcard--nowork, .canvas--chain .cv-work--unlinked { outline: 2px dashed var(--amber); outline-offset: 2px; }
+.canvas--chain .cv-sticky .status-pill { background: rgba(255, 255, 255, .7); }
+.canvas--chain .has-focus .cv-sticky.is-chain, .canvas--chain .canvas-stage.has-focus .cv-sticky.is-chain { box-shadow: 0 0 0 3px var(--canal), 0 4px 10px rgba(20, 30, 35, .18); }
+
+.canvas--chain .kt-band {
+  margin: 0 -12px; padding: 18px 12px; border-radius: 10px;
+  background:
+    linear-gradient(90deg, transparent 213px, rgba(20, 30, 35, .08) 213px, rgba(20, 30, 35, .08) 214px, transparent 214px,
+      transparent 521px, rgba(20, 30, 35, .08) 521px, rgba(20, 30, 35, .08) 522px, transparent 522px,
+      transparent 809px, rgba(20, 30, 35, .08) 809px, rgba(20, 30, 35, .08) 810px, transparent 810px,
+      transparent 1107px, rgba(20, 30, 35, .08) 1107px, rgba(20, 30, 35, .08) 1108px, transparent 1108px),
+    color-mix(in srgb, var(--theme-color, #8a969c) 7%, transparent);
+  border-top: 4px solid var(--theme-color, var(--line));
+}
+.canvas--chain .kt-doelen { gap: 34px; }
+.canvas--chain .kt-header { position: sticky; top: 0; z-index: 3; background: var(--panel-soft); padding: 6px 0; }
+
+.cv-expand {
+  margin-left: auto; flex: none; width: 24px; height: 24px; border-radius: 4px;
+  border: 1px solid rgba(20, 30, 35, .15); background: rgba(255, 255, 255, .6); cursor: pointer; font-size: 12px; line-height: 1;
+}
+.cv-expand[aria-expanded="true"] { background: var(--canal); color: #fff; border-color: var(--canal); }
+.cv-detail { margin: 2px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 8px; font-size: 12px; }
+.cv-detail dt { color: var(--ink-soft); font-weight: 600; }
+.cv-detail dd { margin: 0; overflow-wrap: anywhere; }
+.kt-folded {
+  margin: 0; align-self: center; position: relative; z-index: 1;
+  padding: 8px 12px; border: 1px dashed var(--line); border-radius: 6px; background: var(--panel); color: var(--ink-soft); font-size: 12.5px;
+}
+.kt-doel--folded { grid-template-columns: 260px max-content; }
+.kt-doel--folded .kt-folded { justify-self: start; }
+
+.display-form { display: grid; gap: 12px; }
+
+/* ---------- Stukken (js/documents-view.js, idee 54) ----------
+   Eén vaste leesopmaak voor alle stukken: het stuk levert alleen inhoud.
+   Leesbreedte in ch, zodat de regellengte gelijk blijft als de letter in de
+   kamermodus groeit. */
+.docs-view { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.docs-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.docs-head__title { font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif; font-size: 24px; margin: 0 0 4px; }
+.docs-status:empty { display: none; }
+.docs-status { margin: 0; color: var(--ink-soft); }
+.docs-empty { display: flex; gap: 10px; align-items: baseline; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 16px 18px; }
+.docs-empty p { margin: 0; }
+.docs-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.docs-card { width: 100%; text-align: left; display: grid; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 18px; cursor: pointer; font: inherit; color: inherit; }
+.docs-card:hover { border-color: var(--canal); }
+.docs-card__title { font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif; font-size: 18px; font-weight: 600; }
+.docs-card__meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; }
+
+.doc { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: clamp(18px, 4vw, 40px); }
+.doc__head { margin-bottom: 20px; display: grid; gap: 8px; }
+.doc__head h1 { font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif; font-size: 30px; line-height: 1.2; margin: 0; color: var(--canal-deep); text-wrap: balance; }
+.doc__meta { margin: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; }
+.doc__body { font-size: 16px; line-height: 1.6; }
+/* Tekst houdt een leesbare regellengte; een afbeelding en een tabel krijgen
+   de volle breedte van het stuk. */
+.doc__body > :not(.doc-figure):not(.doc-table) { max-width: 70ch; }
+.doc-figure { margin: 22px 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+/* Nooit breder dan het stuk, nooit groter dan het plaatje zelf is. */
+.doc-figure img { display: block; width: auto; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; }
+.doc-figure figcaption { font-size: 14px; color: var(--ink-soft); }
+.doc-figure--missing { padding: 10px 14px; border: 1px dashed var(--ink-soft); border-radius: var(--radius-sm); font-size: 14px; }
+.doc__body > * + * { margin-top: 14px; }
+.doc__body h2 { font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif; font-size: 22px; margin-top: 30px; padding-bottom: 6px; border-bottom: 2px solid var(--amber-accent); }
+.doc__body h3 { font-size: 17px; margin-top: 22px; }
+.doc__body h4 { font-size: 15px; margin-top: 18px; }
+.doc__body p, .doc__body ul, .doc__body ol { margin-bottom: 0; }
+.doc__body ul, .doc__body ol { padding-left: 22px; }
+.doc__body li + li { margin-top: 4px; }
+.doc__body code { font-size: 0.92em; background: var(--panel-soft); padding: 1px 4px; border-radius: 3px; }
+.doc-table { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); max-width: 100%; }
+.doc-table table { border-collapse: collapse; width: 100%; font-size: 15px; }
+.doc-table th, .doc-table td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.doc-table th { background: var(--panel-soft); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); }
+.doc-table tr:last-child td { border-bottom: 0; }
+.doc-block { border: 1px solid var(--line); border-left-width: 4px; border-radius: var(--radius-sm); padding: 12px 16px; background: var(--panel); }
+.doc-block > * + * { margin-top: 10px; }
+.doc-block__label { margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+.doc-block--observatie { border-left-color: var(--ink-faint); }
+.doc-block--advies { border-left-color: var(--amber-accent); background: var(--amber-bg); }
+.doc-block--besluit { border-left-color: var(--green); background: var(--green-bg); }
+.doc-tasks { list-style: none; padding-left: 0 !important; display: grid; gap: 8px; }
+.doc-task { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px; }
+.doc-task__state { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-soft); margin-right: 6px; white-space: nowrap; }
+.doc-task--done .doc-task__state { color: var(--green); }
+
+.doc-link { background: none; border: none; padding: 0; font: inherit; color: var(--canal); text-decoration: underline; cursor: pointer; }
+.doc-link:hover { color: var(--canal-deep); }
+
+/* Hulp (idee 68): links de onderdelen, rechts één pagina. Nieuw, aangepast en
+   vervallen zijn neutraal (geen statuskleur), met het label als tekst. */
+.doc-block--nieuw, .doc-block--gewijzigd { border-left-color: var(--canal); }
+.doc-block--vervallen { border-left-color: var(--ink-faint); }
+.help-view { max-width: 1180px; margin: 0 auto; display: grid; gap: 12px; }
+.help-view .crumbs { font-size: 14px; }
+.help-view .crumbs__link { font-size: inherit; }
+.help-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; align-items: start; }
+.help-nav { position: sticky; top: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px; }
+.help-nav ul { list-style: none; margin: 0; padding: 0; }
+.help-nav__group + .help-nav__group { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.help-nav__label { display: block; font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif; font-size: 16px; font-weight: 700; color: var(--canal-deep); margin: 0 0 6px 8px; }
+.help-nav__group ul .help-nav__link { padding-left: 16px; }
+.help-nav__link { display: block; width: 100%; text-align: left; background: none; border: none; border-left: 3px solid transparent; border-radius: 0 4px 4px 0; padding: 6px 8px; font: inherit; font-size: 14px; color: var(--ink); cursor: pointer; }
+.help-nav__link:hover { background: var(--panel-soft); }
+.help-nav__link[aria-current="page"] { border-left-color: var(--canal); background: var(--panel-soft); font-weight: 700; }
+.help-release + .help-release, .help-older .help-release { margin-top: 26px; }
+.help-release__date { font-family: var(--font); font-size: 14px; font-weight: 400; color: var(--ink-soft); margin-left: 6px; }
+.help-older { margin-top: 30px; }
+.help-older summary { cursor: pointer; font-weight: 700; }
+.topbar-btn--active { background: rgba(255, 255, 255, .18); }
+/* Smal: eerst de pagina, de onderdelen eronder. */
+@media (max-width: 760px) {
+  .help-layout { grid-template-columns: 1fr; }
+  .help-nav { position: static; order: 2; }
+  .help-nav__link { min-height: 44px; }
+}
+
+body.presentation-mode .doc__head h1 { font-size: 40px; }
+body.presentation-mode .doc__body { font-size: 20px; }
+body.presentation-mode .doc__body h2 { font-size: 28px; }
+body.presentation-mode .doc__body h3 { font-size: 22px; }
+body.presentation-mode .doc-table table { font-size: 18px; }
+body.presentation-mode .docs-card__title { font-size: 22px; }
+
+/* Betrokkenen (naast de ene eigenaar): vinkjes in een compact raster. */
+.involved-picker { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px 10px; margin: 0 0 12px; }
+.involved-picker legend { font-weight: 600; padding: 0 4px; }
+.involved-picker__summary { cursor: pointer; font-weight: 600; min-height: 32px; display: list-item; padding: 4px 0; }
+.involved-picker[open] > .involved-picker__summary { margin-bottom: 6px; }
+.involved-picker__quick { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 8px; }
+.role-group legend { font-weight: 700; }
+.role-group__buttons { display: flex; gap: 6px; margin: 8px 0 0; }
+.involved-picker__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(10em, 1fr)); gap: 4px 12px; }
+.involved-picker__item { display: flex; gap: 6px; align-items: center; min-height: 32px; cursor: pointer; font-size: 14px; }
+.involved-picker .field-hint { margin: 0 0 6px; }
+.form-check { margin: 6px 0 4px; padding: 8px 12px; border-left: 3px solid var(--canal); background: var(--panel-soft); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 13px; }
+.form-check summary { cursor: pointer; font-weight: 600; }
+.form-check ul { margin: 6px 0 4px; padding-left: 0; list-style: none; display: grid; gap: 2px; }
+.form-check p { margin: 4px 0 0; }
+.form-check li > span[aria-hidden] { display: inline-block; width: 1em; font-weight: 700; }
+.form-check__niet > span[aria-hidden] { color: var(--ink-soft); }
+.form-check__wel > span[aria-hidden] { color: var(--canal); }
+/* Signaal bij het formuleren: rustig en neutraal, geen statuskleur. Leeg
+   blijft het in de toegankelijkheidsboom, zodat de melding voorgelezen wordt. */
+.form-signal { margin: 0; font-size: 13px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.form-signal:not(:empty) { margin-top: 6px; padding: 6px 10px; border: 1px dashed var(--ink-soft); border-radius: var(--radius-sm); }
+.form-signal:not(:empty)::before { content: "?" / ""; display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1px solid currentColor; font-weight: 700; font-size: 12px; }
+.form-signal span { flex: 1 1 200px; }
+.involved-line { font-size: 13px; }
+.work-type-badge { font-size: 12px; padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft); white-space: nowrap; }
+.work-type-summary { margin: 0 0 8px; }
+.color-picker { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 12px 10px; margin: 0 0 12px; }
+.color-picker legend { font-weight: 600; padding: 0 4px; }
+.color-picker .field-hint { margin: 0 0 8px; }
+.color-picker__list { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.color-picker__swatch { position: relative; cursor: pointer; }
+.color-picker__swatch input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.color-picker__dot { display: block; width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); }
+.color-picker__swatch input:checked + .color-picker__dot { box-shadow: 0 0 0 3px var(--ink); }
+.color-picker__swatch input:focus-visible + .color-picker__dot { outline: 2px solid var(--canal); outline-offset: 3px; }
+.color-picker__custom { display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; font-size: 14px; }
+.color-picker__custom input[type="color"] { width: 44px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius-sm); background: none; }
+.principle-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 16px; }
+.principle-summary__label { font-size: 13px; }
+.principle-summary__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.principle-summary__item { font: inherit; font-size: 12.5px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 100px; background: var(--panel); color: var(--ink-soft); cursor: pointer; min-height: 32px; }
+.principle-summary__item strong { color: var(--ink); }
+.principle-summary__item--quiet { border-style: dashed; background: none; }
+.principle-summary__item:hover { border-color: var(--canal); }
+.principle-summary__item--active { border-color: var(--canal-deep); box-shadow: inset 0 0 0 1px var(--canal-deep); }
+.principle-summary__attention { color: var(--red); }
+/* Principe uit de visie: tekst in een rustig kader, geen eigen kleur (kleur betekent op het bord al status). */
+/* Een label, geen knop: zonder rand, zodat het niet lijkt op een knop als "Op de agenda zetten". */
+.principle-badge { font-size: 12px; padding: 1px 8px; background: var(--panel-soft); border-radius: 999px; color: var(--ink-soft); white-space: nowrap; max-width: 14em; overflow: hidden; text-overflow: ellipsis; }
+.principles-form .principle-row { display: grid; grid-template-columns: minmax(9em, 1fr) 2fr auto; gap: 6px; margin-bottom: 6px; }
+.principles-form .principle-row input { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.principles-form .principle-row { grid-template-columns: minmax(12em, 1.2fr) 2fr 7.5em; }
+.principles-form__add { margin-top: 2px; }
+@media (max-width: 860px) { .principles-form .principle-row { grid-template-columns: 1fr; } }
+
+/* Beoordelingsronde (js/modal.js viewReviewRound): één item tegelijk, met de
+   voortgang groot genoeg om van een afstand te lezen. */
+.review__progress { margin: 0 0 4px; font-size: 15px; }
+.review__bar { width: 100%; height: 8px; margin-bottom: 12px; accent-color: var(--canal); }
+.review__title { margin: 4px 0 8px; font-size: 18px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.review__reasons { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--ink-soft); }
+.review__reason--done { color: var(--green); }
+.review__counts { list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 4px; color: var(--ink-soft); }
+.review__counts strong { color: var(--ink); display: inline-block; min-width: 2ch; text-align: right; margin-right: 6px; }
+.item-list__row--late { box-shadow: inset 3px 0 0 var(--red); }
+.review__note-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.review__note-row input { flex: 1 1 12em; min-width: 0; }
+.review__note-row select { flex: 0 0 auto; width: 11em; }
+.review__note .error-text:empty { display: none; }
+/* In de kamermodus is het werk zelf (status, eigenaar, notitie) wat de groep
+   moet kunnen lezen, niet alleen de titel. */
+body.presentation-mode .modal:has(.review__progress) { max-width: min(960px, 92vw); }
+body.presentation-mode .review__title { font-size: 26px; }
+body.presentation-mode .review__progress { font-size: 20px; }
+body.presentation-mode .modal:has(.review__progress) .field label { font-size: 14px; }
+body.presentation-mode .modal:has(.review__progress) :is(select, input, .btn, .review__reasons, .crumbs) { font-size: 18px; }
+body.presentation-mode .modal:has(.review__progress) .field-hint { font-size: 15px; }
+.display-form__colors { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 6px; }
+/* In bulk wijzigen in Samenhang (idee 89). */
+.cv-select { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; margin: -6px 2px -6px -6px; cursor: pointer; }
+.cv-select input { width: 22px; height: 22px; cursor: pointer; }
+.canvas--selecting .cv-card, .canvas--selecting .cv-mr, .canvas--selecting .cv-action { cursor: pointer; }
+.canvas--selecting .canvas-viewport { padding-bottom: 72px; }
+.bulk-bar__sep { width: 1px; align-self: stretch; background: var(--line); }
+.canvas--selecting .cv-card:has(.cv-select input:checked), .canvas--selecting .cv-mr:has(.cv-select input:checked), .canvas--selecting .cv-action:has(.cv-select input:checked) { outline: 3px solid var(--canal-deep, #234559); outline-offset: 2px; }
+.bulk-bar { position: sticky; bottom: 12px; z-index: 30; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 12px auto 0; padding: 10px 14px; background: var(--panel, #fff); border: 1px solid var(--line); border-radius: var(--radius-sm, 8px); box-shadow: 0 6px 24px rgba(20, 30, 35, .18); }
+.bulk-bar__field { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; font-weight: 600; }
+.bulk-bar__notice { flex: 1 1 14em; font-size: 14px; color: var(--ink-soft); display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.bulk-bar__delete { color: var(--red, #b3261e); }
+.cv-value { font-size: 12px; font-weight: 700; color: var(--ink); background: var(--panel, #fff); border: 1px solid var(--line); border-radius: 999px; padding: 0 7px; white-space: nowrap; }
+.bulk-preview { margin: 0 0 12px; font-weight: 600; color: var(--ink-soft); }
+.display-form__views { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; }
+.display-form__color { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.display-form__color input { width: 36px; height: 28px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: none; }
+
+
+/* De muur met geeltjes (12 okt 2026, visueel ontwerp van de UX-designer):
+   een lichte muur, per thema een kolom in een tint van de themakleur, doelen
+   op geel papier met een vleugje themakleur, projecten op papier in de
+   themakleur. Afstanden in veelvouden van .5em; letters groot genoeg voor
+   twee à drie meter. Status blijft symbool + tekst, ook in zwart-wit. */
+/* Het hele vel is de muur: één achtergrond van rand tot rand, en kop,
+   briefjes en legenda binnen dezelfde marge rondom. */
+/* De kaartjes: een vaste maat in millimeters (127 × 76 mm op A1), op elk vel
+   dezelfde. --k maakt ze groter op A0 en kleiner op A3. Zes kolommen van
+   127 mm met 7 mm ertussen passen precies binnen A1 min de rand. */
+/* Wit papier (David, 12 november 2026): een getinte achtergrond kost inkt en wordt vaak vlekkerig afgedrukt. */
+.sheet--wall { --wall: #fff; --card-w: calc(var(--k) * 127mm); --card-h: calc(var(--k) * 76mm); --card-gap: calc(var(--k) * 7mm); background: var(--wall); padding: calc(var(--k) * 6mm); }
+.sheet--theme-wall { --wall: #fff; }
+.pw-wall { background: none; }
+/* Een kleine opvulling binnen het geschaalde deel (gemeten bij het passend
+   maken), zodat de plakband en schaduw van de buitenste briefjes niet worden afgesneden. */
+.sheet--wall .sheet__title { font-size: 3.4em; }
+.sheet--wall .sheet__sub, .sheet--wall .sheet__dates { font-size: 1.4em; }
+.sheet--wall .sheet__legend { font-size: 1.35em; }
+.sheet--wall .sheet__head { border-bottom-color: var(--theme-color, #234559); }
+.sheet--theme-wall .sheet__head { background: var(--theme-color, #234559); color: var(--theme-ink, #fff); padding: .5em 1em; border-radius: .3em; border-bottom: .3em solid color-mix(in srgb, var(--theme-color, #234559) 70%, #000); }
+.sheet--theme-wall .sheet__head .sheet__board, .sheet--theme-wall .sheet__head .sheet__sub, .sheet--theme-wall .sheet__head .sheet__dates { color: inherit; }
+
+.pw-vision { background: #234559; color: #fff; padding: .75em 1em; margin-bottom: 1.5em; }
+.pw-vision span { font-size: .85em; text-transform: uppercase; letter-spacing: .1em; opacity: .85; }
+.pw-vision p { margin: .25em 0 0; font-size: 1.6em; line-height: 1.3; }
+
+/* Het raster: per thema een blok zo breed als zijn kolommen, met de kop in
+   de themakleur; elke kolom kaartjes onder elkaar. */
+.pw-board { display: flex; gap: var(--card-gap); align-items: flex-start; }
+.pw-theme { width: calc(var(--cols) * var(--card-w) + (var(--cols) - 1) * var(--card-gap)); display: grid; gap: calc(var(--k) * 4mm); align-content: start; }
+.pw-theme__more { font-weight: 400; font-size: .7em; }
+.pw-grid { display: flex; gap: var(--card-gap); align-items: flex-start; }
+.pw-col { display: flex; flex-direction: column; gap: var(--card-gap); width: var(--card-w); }
+.sheet--wall .pw-note { width: var(--card-w); height: var(--card-h); box-sizing: border-box; overflow: hidden; align-content: start; gap: .35em; padding: .8em 1em; }
+/* Afkappen met "…" na een vast aantal regels: een kaartje groeit nooit. */
+.pw-clamp, .sheet--wall .pw-note__title, .pw-result__done, .pw-result__goal, .pw-result__now { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.sheet--wall .pw-note__title { -webkit-line-clamp: 3; }
+.pw-note--result .pw-note__title { -webkit-line-clamp: 2; }
+.pw-result__done { -webkit-line-clamp: 2; }
+.pw-result__goal, .pw-result__now { -webkit-line-clamp: 1; }
+.pw-note--gap { margin: 0; background: none; border: .2em dashed color-mix(in srgb, var(--theme-color, #234559) 60%, #000); box-shadow: none; color: #222; font-weight: 700; font-size: 1.1em; }
+.pw-note--gap p { margin: 0; }
+.pw-theme__head { margin: 0; padding: .6em 1em; background: var(--theme-color, #234559); color: var(--theme-ink, #fff); border-radius: .3em .3em 0 0; border-bottom: .3em solid color-mix(in srgb, var(--theme-color, #234559) 70%, #000); }
+.pw-theme__head h2 { margin: 0; font-size: 1.6em; line-height: 1.15; }
+.pw-theme__head p { margin: .35em 0 0; font-size: .95em; display: flex; flex-wrap: wrap; gap: .4em .6em; align-items: center; }
+
+.pw-note { position: relative; padding: 1em 1em .8em; display: grid; gap: .5em; border: 1px solid rgba(0, 0, 0, .08); transform: rotate(var(--tilt, 0deg)); box-shadow: .12em .18em 0 rgba(0, 0, 0, .16); break-inside: avoid; }
+/* Een scherpe schaduw zonder vervaging: Chrome zet een wazige schaduw als
+   afbeelding in de PDF, en elke viewer en printer tekent die anders. Een
+   schaduw zonder vervaging is een gewoon vlak en ziet er overal hetzelfde uit. */
+.pw-note--doel { background: color-mix(in srgb, var(--theme-color, #234559) 7%, #fff3a3); border-left: .4em solid var(--theme-color, #234559); }
+.pw-note--doel::after { content: ""; position: absolute; top: -.4em; left: 50%; width: 3em; height: .8em; margin-left: -1.5em; background: rgba(255, 255, 255, .55); border: 1px solid rgba(0, 0, 0, .05); transform: rotate(-1.5deg); }
+.pw-note--project { background: color-mix(in srgb, var(--theme-color, #234559) 36%, #fff); border-left: .35em solid color-mix(in srgb, var(--theme-color, #234559) 70%, #000); }
+.pw-note__title { margin: 0; font-size: 1.5em; line-height: 1.2; }
+.pw-note--project .pw-note__title { font-size: 1.3em; }
+/* Muur 2: meetbare resultaten. Wit papier met een streep in de themakleur,
+   zodat het als ander soort vel leest dan het gele doelbriefje. */
+.pw-note--result { background: #fffef9; border-top: .4em solid var(--theme-color, #234559); }
+.pw-note--result .pw-note__title { font-size: 1.3em; }
+.pw-result--red { border: .55em solid #8c2f22; }
+.pw-result--amber { border: .3em solid #b07a1c; border-top-width: .4em; }
+.pw-result--grey { border: .2em dashed #3d4a50; border-top: .4em solid var(--theme-color, #234559); }
+.pw-stale { margin: 0 0 .5em; padding: .35em .8em; border: .15em solid #8c2f22; border-radius: .3em; font-size: 1.6em; font-weight: 700; color: #8c2f22; width: fit-content; }
+.pw-result__done { margin: 0; font-size: 1em; line-height: 1.3; }
+.pw-result__done span { font-weight: 700; }
+.pw-result__now { margin: 0; font-size: .9em; font-style: italic; color: #3a3a3a; }
+.pw-result__goal { margin: 0; font-size: .85em; color: #444; }
+.pw-result__write { margin: .3em 0 0; padding-top: .5em; border-top: 1px dashed rgba(0, 0, 0, .3); font-size: .95em; display: flex; align-items: flex-end; gap: .4em; }
+.pw-line { flex: 1; border-bottom: 1px solid #333; height: 1.2em; }
+.pw-line--short { flex: 0 0 4.5em; }
+.pw-note__meta { margin: 0; font-size: 1em; display: flex; flex-wrap: wrap; gap: .4em .6em; align-items: center; }
+.pw-noowner { font-style: italic; color: #6b5b00; }
+.pw-note__principles { margin: 0; font-size: .9em; font-style: italic; color: #3a3a3a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pw-note__count { margin: 0; padding-top: .5em; border-top: 1px solid rgba(0, 0, 0, .15); font-size: .9em; color: #4a4a4a; }
+.pw-late { color: #9b1c1c; font-weight: 700; text-decoration: underline; }
+
+/* Status op de muur: wit pilletje, kleur alleen in rand en symbool. */
+.sheet--wall .pm { background: #fff; color: #111; border: 1.5px solid currentColor; font-size: .95em; }
+.sheet--wall .pm .pm__sym { font-weight: 700; }
+.sheet--wall .pm--green { border-color: #1e7a3a; } .sheet--wall .pm--green .pm__sym { color: #1e7a3a; }
+.sheet--wall .pm--amber { border-color: #a05a00; } .sheet--wall .pm--amber .pm__sym { color: #a05a00; }
+.sheet--wall .pm--red { border-color: #b3261e; } .sheet--wall .pm--red .pm__sym { color: #b3261e; }
+.sheet--wall .pm--grey { border-color: #555; } .sheet--wall .pm--grey .pm__sym { color: #555; }
+.sheet--wall .pm--blue { border-color: #1f5f99; } .sheet--wall .pm--blue .pm__sym { color: #1f5f99; }
+.sheet--wall .pm--done { border-color: #1e7a3a; } .sheet--wall .pm--done .pm__sym { color: #1e7a3a; }
+.sheet--wall .sheet__legend .pm { font-size: 1em; }
+
+
+
+.kt-bands { display: grid; gap: 14px; }
+
+/* Verschuiven en verbinden (js/wall.js, SortableJS). */
+.canvas--chain [data-sort] .cv-sticky { cursor: grab; }
+.canvas--chain .is-drag-chosen { cursor: grabbing; }
+/* Slepen op het Bord: dezelfde terugkoppeling als op de muur. */
+.board .is-drag-chosen { cursor: grabbing; }
+.board .is-drag-ghost { opacity: .35; outline: 2px dashed var(--canal); outline-offset: 2px; }
+.board .theme-col__head { cursor: grab; }
+.canvas--chain .is-drag-ghost { opacity: .35; outline: 2px dashed var(--canal); outline-offset: 2px; }
+.is-dragging { opacity: .95; transform: rotate(2deg) !important; box-shadow: 0 10px 24px rgba(20, 30, 35, .25) !important; }
+.canvas-stage.is-dnd-active .canvas-links { opacity: .15; }
+.canvas-stage.is-dnd-active [data-sort="work"], .canvas-stage.is-dnd-active [data-sort="actions"] { outline: 1px dashed rgba(35, 69, 89, .35); outline-offset: 4px; border-radius: 6px; }
+.kt-cell--actions[data-sort="actions"]:empty { min-height: 24px; }
+.kt-row--empty { pointer-events: none; }
+
+.cv-connect {
+  flex: none; width: 24px; height: 24px; border-radius: 50%; padding: 0;
+  border: 1px solid rgba(20, 30, 35, .25); background: rgba(255, 255, 255, .75); color: var(--canal);
+  cursor: crosshair; font-size: 14px; line-height: 1; touch-action: none;
+}
+.cv-connect:hover, .cv-connect:focus-visible { background: var(--canal); color: #fff; }
+.cv-link--draft { stroke: var(--canal); stroke-width: 2.5; stroke-dasharray: 6 4; opacity: 1; }
+.cv-mrcard.is-drop-target { box-shadow: 0 0 0 4px var(--green), 0 4px 10px rgba(20, 30, 35, .18) !important; }
+.canvas-stage.is-connecting .cv-mrcard { outline: 2px dashed var(--green); outline-offset: 3px; }
+/* De lege "los koppelen"-plek: altijd aanwezig maar smal en rustig, zodat
+   de muur niet verschuift zodra het slepen begint (dan zou je loslaten op
+   een andere plek dan waar je op mikte). */
+.kt-mrgroup--dropzone .kt-cell--mr .kt-gap { padding: 2px 6px; font-size: 11px; font-weight: 500; border-color: rgba(169, 113, 26, .45); background: transparent; }
+.kt-mrgroup--dropzone .kt-rows { min-height: 22px; }
+.kt-mrgroup--dropzone .kt-none { font-size: 11px; opacity: .7; }
+
+/* ---------- Keten als organogram ----------
+   Visie bovenaan, daaronder elk niveau op één hoogte; broers en zussen naast
+   elkaar. Lijnen haaks van boven naar beneden (drawConnections, l.org). */
+.og-tree { display: flex; justify-content: center; width: max-content; min-width: 100%; padding: 8px 0 24px; }
+.og-node { display: flex; flex-direction: column; align-items: center; }
+.og-children { display: flex; gap: 18px; align-items: flex-start; margin-top: 46px; }
+.og-item { width: 230px; display: grid; gap: 6px; justify-items: stretch; position: relative; z-index: 1; }
+.og-item--vision { width: 360px; }
+.og-vision { background: var(--canal); color: #fff; padding: 10px 14px; border: 0; }
+.og-vision__label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .85; }
+.og-vision p { margin: 2px 0 0; font-size: 13.5px; line-height: 1.4; }
+.og-theme { border-radius: var(--radius-sm); box-shadow: var(--shadow); }
+.og-toggle {
+  justify-self: center; font: inherit; font-size: 12px; padding: 2px 10px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink-soft);
+}
+.og-toggle[aria-expanded="true"] { background: var(--canal); color: #fff; border-color: var(--canal); }
+
+/* ---------- Keten als mindmap ----------
+   De visie in het midden, per thema een tak in de themakleur die dunner
+   wordt naar buiten. Posities en takken zijn uitgerekend (mindmapLayout). */
+.mm-canvas { position: relative; }
+.mm-lines { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; }
+.mm-branch { fill: none; stroke: var(--branch, var(--canal)); stroke-linecap: round; opacity: .55; }
+.mm-branch--unlinked { stroke-dasharray: 2 7; }
+.canvas-stage.has-focus .mm-branch { opacity: .12; }
+.canvas-stage.has-focus .mm-branch.is-chain { opacity: .95; }
+.mm-node { position: absolute; transform: translate(-50%, -50%); width: 200px; display: grid; gap: 4px; justify-items: stretch; z-index: 1; }
+.mm-node--vision { width: 300px; }
+.mm-node--vision .og-vision { border-radius: 50% / 40%; text-align: center; padding: 22px 26px; }
+.mm-node .cv-card { font-size: 12.5px; }
+
+/* --- Inbox (nieuw werk, wacht op een besluit) --------------------------- */
+/* Compact (ontwerp UX-designer): één regel per item, hooguit drie in beeld,
+   zodat de agenda zelf ook boven de vouw blijft. */
+.inbox { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--amber-accent); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 20px; }
+.inbox__head { margin-bottom: 4px; }
+.inbox__head h3 { font-size: 15px; }
+.inbox__head h3:focus { outline: none; }
+.inbox__head h3:focus-visible { outline: 2px solid var(--canal); outline-offset: 2px; }
+.inbox__sub { font-weight: 400; color: var(--ink-soft); font-size: 13px; margin-left: 4px; }
+.inbox__tools { display: flex; gap: 8px; }
+.inbox__status:empty { display: none; }
+.inbox__status { margin: 0 0 6px; font-size: 13px; }
+.inbox__over { margin: 6px 0 8px; }
+.inbox__list { list-style: none; margin: 0; padding: 0; }
+.inbox-item { position: relative; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 4px 8px; margin: 0 -8px; border-top: 1px solid var(--line-soft); border-radius: var(--radius-sm); }
+.inbox-item:hover { background: var(--panel-soft); }
+.inbox-item__main { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 8px; overflow: hidden; }
+.inbox-item__open { font: inherit; color: inherit; text-align: left; background: none; border: 0; padding: 8px 0; cursor: pointer; }
+/* De hele regel is klikbaar; de link naar GitHub ligt erboven. */
+.inbox-item__open::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-sm); }
+.inbox-item__open:focus-visible { outline: none; }
+.inbox-item__open:focus-visible::after { outline: 2px solid var(--canal); outline-offset: -2px; }
+.inbox-item__title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: none; max-width: 60%; }
+.inbox-item__why { color: var(--ink-soft); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.inbox-item__meta { flex: none; display: flex; align-items: baseline; gap: 10px; font-size: 13px; color: var(--ink-soft); }
+.inbox-item__meta a { position: relative; z-index: 1; color: var(--ink-soft); padding: 8px 2px; }
+.inbox-item__lang { color: var(--amber); font-weight: 700; }
+.inbox-item .btn { flex: none; position: relative; z-index: 1; }
+.inbox__more > summary { cursor: pointer; font-size: 13px; color: var(--ink-soft); padding: 10px 0; border-top: 1px solid var(--line-soft); }
+.inbox__parked { margin: 6px 0 0; font-size: 13px; }
+.inbox-kinds { margin-bottom: 14px; flex-wrap: wrap; }
+.inbox-form p.muted { font-size: 13px; }
+.inbox-form__error:empty { display: none; }
+.inbox-counter { display: inline-flex; align-items: center; gap: 6px; }
+.inbox-counter__n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: #fff; color: var(--canal-deep); font-size: 12px; }
+.inbox-counter--over .inbox-counter__n { background: #ffe9b8; color: #6b4300; }
+@media (max-width: 600px) {
+  .inbox-counter__label { display: none; }
+  .inbox-counter { padding: 0 8px; }
+  .inbox-item { flex-wrap: wrap; gap: 0 12px; }
+  .inbox-item__main { flex-basis: 100%; flex-direction: column; gap: 0; }
+  .inbox-item__title { max-width: 100%; white-space: normal; }
+  .inbox-item__why { white-space: normal; }
+}
+
+/* Bijdragen aan een resultaat elders, in het projectscherm (idee 64). */
+.elsewhere { margin: 10px 0 8px; }
+.elsewhere__sub { margin: 0 0 6px; font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+.elsewhere__list:empty { display: none; }
+.elsewhere__list { margin-bottom: 8px; }
+.field .elsewhere-opt { border-radius: var(--radius-sm); font-weight: 600; text-transform: none; letter-spacing: 0; font-size: 13px; }
+.field .elsewhere-opt .muted { font-weight: 400; }
+.elsewhere select { width: 100%; min-height: 40px; }
+
+/* Een project naar de kolom Actie slepen maakt er een actie van (idee 65):
+   tijdens het slepen zeggen de plekken in die kolom dat, in tekst. */
+.canvas-stage.is-dragging-project [data-sort="actions"] { outline: 2px dashed var(--blue); outline-offset: 4px; min-height: 40px; }
+.canvas-stage.is-dragging-project [data-sort="actions"]::before { content: 'Wordt hier een actie'; display: block; font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+.convert-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.convert-row__text { margin: 0; font-size: 13px; color: var(--ink-soft); }
+.convert-row .btn { flex: none; }
+
+/* Doel ↔ meetbaar resultaat in de keten (idee 71): tijdens het slepen zegt
+   de andere kolom wat er gebeurt als je loslaat. */
+.canvas-stage.is-dragging-objective [data-sort="mrs"] { outline: 2px dashed var(--green); outline-offset: 4px; }
+.canvas-stage.is-dragging-objective [data-sort="mrs"]::before { content: 'Wordt hier een meetbaar resultaat'; display: block; font-size: 12px; font-weight: 700; color: var(--green); margin-bottom: 4px; }
+.canvas-stage.is-dragging-result [data-sort="objectives"] { outline: 2px dashed var(--amber); outline-offset: 4px; }
+.canvas-stage.is-dragging-result [data-sort="objectives"]::before { content: 'Wordt hier een doel'; display: block; font-size: 12px; font-weight: 700; color: var(--amber); margin-bottom: 4px; }
+.convert-row select { max-width: 40%; }
+/* Met een keuze erbij (doel → meetbaar resultaat): de uitleg over de volle
+   breedte, daaronder de keuze en de knop op één regel. */
+.convert-row--stacked { flex-direction: column; align-items: stretch; gap: 8px; }
+.convert-row__controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.convert-row__label { font-size: 13px; font-weight: 600; }
+.convert-row--stacked select { max-width: none; flex: 1 1 220px; min-width: 0; min-height: 32px; }
+
+/* Losse acties in het doelscherm (idee 77): de rest achter een uitklapknop. */
+.loose-actions > summary { cursor: pointer; padding: 6px 0; font-size: 13px; color: var(--canal); }
+.loose-actions[open] > summary { margin-bottom: 6px; }
+@media (pointer: coarse) { .loose-actions > summary { padding: 12px 0; } }
+
+/* Het doelscherm als keten (idee 77): elk resultaat met wat eraan bijdraagt. */
+.modal-section__buttons { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.chain-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 12px; }
+.chain { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px; background: var(--panel); }
+.chain--loose { margin-top: 12px; border-style: dashed; }
+.chain__head { margin: 2px 2px 8px; font-size: 13px; }
+.chain__result { background: var(--panel-soft); font-weight: 600; }
+.chain__projects, .chain__calm { margin: 6px 0 0 20px; }
+.chain__actions { margin: 4px 0 0 20px; }
+.chain__item { list-style: none; }
+.chain__empty { margin: 6px 0 2px 20px; font-size: 13px; }
+.chain__calm > summary { cursor: pointer; padding: 6px 0; font-size: 13px; color: var(--canal); }
+.chain__calm > .chain__projects { margin-left: 0; }
+@media (pointer: coarse) { .chain__calm > summary { padding: 12px 0; } }
+@media (max-width: 600px) { .chain__projects, .chain__calm, .chain__actions, .chain__empty { margin-left: 8px; } }
+/* Alleen het resultaat is een gevuld vlak; projecten en acties hangen er
+   als boom onder, op wit met een lijn links (advies UX-designer). */
+.chain__projects .item-list__row, .chain__actions .item-list__row { background: none; border-left: 2px solid var(--line); border-radius: 0; }
+.chain__projects .item-list__row:hover, .chain__actions .item-list__row:hover { background: var(--panel-soft); }
+.chain__projects, .chain__calm { margin-left: 16px; }
+.chain__actions { margin-left: 16px; }
+@media (max-width: 600px) {
+  .chain__projects, .chain__calm, .chain__actions, .chain__empty { margin-left: 8px; }
+  .chain .item-list__name { flex-basis: 100%; order: -1; }
+}
+
+/* Gaten in de keten op de Agenda (idee 79): per soort een telling die je
+   openklikt; de eigenaar rechts in de regel, want het is zijn werk. */
+.gap-group { margin: 6px 0; }
+.gap-group > summary { cursor: pointer; font-weight: 600; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--panel-soft); }
+.gap-group > summary:hover { border-color: var(--ink-soft); }
+.gap-group > summary:focus-visible { outline: 2px solid var(--canal); outline-offset: 2px; }
+.gap-group[open] > summary { border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.gap-group > .timeline-list { margin: 0 0 0 12px; }
+.agenda-owner { margin-left: auto; font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+body.presentation-mode .agenda-owner, body.presentation-mode .gap-group > summary { font-size: 18px; }
+.meeting-done p.meeting-done__late { flex-basis: 100%; color: var(--ink); font-weight: 600; }
+
+/* Tekst in de kaartjes van vaste maat: zo groot dat hij op twee à drie meter
+   leesbaar is (titels rond 22 pt, de rest minstens 14 pt op A1). */
+.sheet--wall .pw-note { font-size: 1.2em; }
+.sheet--wall .pw-note--doel .pw-note__title, .sheet--wall .pw-note--project .pw-note__title { font-size: 1.55em; line-height: 1.15; }
+.sheet--wall .pw-note--result .pw-note__title { font-size: 1.35em; line-height: 1.15; }
+.sheet--wall .pw-note__meta, .sheet--wall .pw-result__done { font-size: 1em; }
+.sheet--wall .pw-note__count, .sheet--wall .pw-note__principles, .sheet--wall .pw-result__goal, .sheet--wall .pw-result__now, .sheet--wall .pw-result__write { font-size: .9em; }
+.sheet--wall .pw-note--result { gap: .25em; padding: .6em .8em; }
+/* Elk onderdeel van een kaartje houdt zijn hoogte; past het niet, dan wijkt
+   eerst "Laatst bekend", en de regel om bij te schrijven staat onderaan. */
+.sheet--wall .pw-note { display: flex; flex-direction: column; }
+.sheet--wall .pw-note > * { flex-shrink: 0; }
+.sheet--wall .pw-note > .pw-result__now { flex-shrink: 1; min-height: 0; }
+.sheet--wall .pw-result__write { margin-top: auto; }
+.sheet--wall .pw-note--result .pw-note__title { font-size: 1.25em; }
+.sheet--wall .pw-note--result { gap: .2em; padding: .5em .8em; }
+.sheet--wall .pw-note--result .pw-note__title { font-size: 1.2em; }
+.sheet--wall .pw-note--result .pw-result__write { padding-top: .3em; }
+/* Status en eigenaar minstens 14 pt op A1 (review Obeya-coach); het doel op
+   een resultaatkaartje mag twee regels, zodat de context niet wegvalt. */
+.sheet--wall .pw-note .pm { font-size: 1em; }
+.sheet--wall .pw-result__goal { -webkit-line-clamp: 2; }
+/* De regel met status, eigenaar en kwartaal hooguit twee regels hoog: past
+   het niet, dan valt het kwartaal weg, niet de eigenaar. */
+.sheet--wall .pw-note--result { gap: .12em; }
+.sheet--wall .pw-note--result .pw-note__meta { max-height: 3.5em; overflow: hidden; row-gap: .2em; }
+.sheet--wall .pw-result__goal--kort { -webkit-line-clamp: 1; }

@@ -1,0 +1,5 @@
+# Het Obeya-bord is bedoeld voor het team, niet voor zoekmachines. De inhoud
+# achter de inlogpoort is sowieso niet bereikbaar voor een crawler, maar ook de
+# meegeleverde demodata hoeft niet in zoekresultaten te belanden.
+User-agent: *
+Disallow: /
