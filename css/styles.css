@@ -2041,10 +2041,8 @@ body.presentation-mode .app-topbar .app-header__title { font-size: 32px; }
 .help-nav__link { display: block; width: 100%; text-align: left; background: none; border: none; border-left: 3px solid transparent; border-radius: 0 4px 4px 0; padding: 6px 8px; font: inherit; font-size: 14px; color: var(--ink); cursor: pointer; }
 .help-nav__link:hover { background: var(--panel-soft); }
 .help-nav__link[aria-current="page"] { border-left-color: var(--canal); background: var(--panel-soft); font-weight: 700; }
-.help-release + .help-release, .help-older .help-release { margin-top: 26px; }
+.help-release + .help-release { margin-top: 26px; }
 .help-release__date { font-family: var(--font); font-size: 14px; font-weight: 400; color: var(--ink-soft); margin-left: 6px; }
-.help-older { margin-top: 30px; }
-.help-older summary { cursor: pointer; font-weight: 700; }
 .topbar-btn--active { background: rgba(255, 255, 255, .18); }
 /* Smal: eerst de pagina, de onderdelen eronder. */
 @media (max-width: 760px) {

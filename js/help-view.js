@@ -17,8 +17,9 @@ const ObeyaHelpView = (function () {
   const NIEUW = 'nieuw';
   const METHODE = 'obeya-methode';
   const GROEPEN = ['Achtergrond', 'Weergaven', 'Werken met het bord', 'Overleg en delen'];
-  // Hoeveel versies "Wat is er nieuw" open laat zien; de rest staat ingeklapt.
-  const RECENTE_VERSIES = 5;
+  // "Wat is er nieuw" toont alleen de versies van de laatste maand (besluit
+  // 25 november 2026). Oudere versies staan in RELEASENOTES.md.
+  const RECENT_MAANDEN = 1;
 
   function content() {
     return typeof OBEYA_HELP !== 'undefined' ? OBEYA_HELP : { pages: [], changelog: '' };
@@ -88,13 +89,16 @@ const ObeyaHelpView = (function () {
         ${ObeyaDocs.parse(r.text, 'RELEASENOTES.md', { today, pageLinks: true }).html}
       </section>`;
     const alle = releases(content().changelog);
-    const recent = alle.slice(0, RECENTE_VERSIES);
-    const ouder = alle.slice(RECENTE_VERSIES);
+    const grens = new Date(`${today}T00:00:00Z`);
+    grens.setUTCMonth(grens.getUTCMonth() - RECENT_MAANDEN);
+    const vanaf = grens.toISOString().slice(0, 10);
+    const binnen = alle.filter((r) => !r.datum || r.datum >= vanaf);
+    // Altijd minstens de nieuwste uitgebrachte versie.
+    const recent = binnen.some((r) => r.versie) ? binnen : [...binnen, ...alle.filter((r) => r.versie).slice(0, 1)];
     return {
       titel: 'Wat is er nieuw',
-      meta: `Per versie, nieuwste eerst · nu versie ${OBEYA_APP_VERSION}`,
-      html: `${recent.map(blok).join('')}
-        ${ouder.length ? `<details class="help-older"><summary>Oudere versies (${ouder.length})</summary>${ouder.map(blok).join('')}</details>` : ''}`,
+      meta: `De laatste maand, nieuwste eerst · nu versie ${OBEYA_APP_VERSION}`,
+      html: recent.map(blok).join(''),
     };
   }
 

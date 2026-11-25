@@ -4,6 +4,11 @@ Wat er per versie nieuw of anders is in de Obeya-app.
 
 ## Nog niet uitgebracht
 
+## 0.53.0 — 2026-11-25
+
+### Gewijzigd
+- **Wat is er nieuw** toont alleen de versies van de laatste maand.
+
 ## 0.52.0 — 2026-11-25
 
 ### Gewijzigd
