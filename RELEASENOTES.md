@@ -4,6 +4,11 @@ Wat er per versie nieuw of anders is in de Obeya-app.
 
 ## Nog niet uitgebracht
 
+## 0.54.0 — 2026-11-26
+
+### Gewijzigd
+- **Wie mag bevestigen, regelt GitHub** — met het team verbonden mag alleen bevestigen wie in het team *bevestigers* van de GitHub-organisatie zit. Je token heeft daarvoor het recht *Members: Read-only* nodig.
+
 ## 0.53.0 — 2026-11-25
 
 ### Gewijzigd

@@ -10,4 +10,10 @@ const ObeyaTeamConfig = Object.freeze({
   // Waar het data-repo eerder stond. Wie dat adres nog heeft opgeslagen,
   // krijgt vanzelf het nieuwe (verhuisd naar de organisatie op 25 november 2026).
   formerDataRepos: ['https://github.com/GemLDBTOD22/obeya_back-end'],
+  // Wie mag bevestigen, bepaalt dit team in de GitHub-organisatie van het
+  // data-repo (de naam in het adres van het team, bijv. .../teams/bevestigers).
+  // Geldt alleen als je met het teamrepo verbonden bent; zonder verbinding
+  // (het demobord) gelden de rollen in de app. Leeg laten om alleen de rollen
+  // te gebruiken.
+  confirmTeam: 'bevestigers',
 });

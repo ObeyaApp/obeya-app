@@ -291,6 +291,42 @@ const ObeyaGitBackend = (function () {
 
   // --- publieke acties ------------------------------------------------
 
+  // Het GitHub-team dat bepaalt wie mag bevestigen, of '' als dat niet
+  // geldt: alleen met het teamrepo uit team-config.js, en alleen als daar een
+  // team staat. Een eigen repo houdt de rollen in de app.
+  function confirmTeam() {
+    const slug = typeof ObeyaTeamConfig !== 'undefined' && ObeyaTeamConfig ? String(ObeyaTeamConfig.confirmTeam || '').trim() : '';
+    if (!slug || !isConfigured()) return '';
+    return getSettings().isTeamRepo ? slug : '';
+  }
+
+  // De leden van een team in de organisatie die eigenaar is van het data-repo,
+  // als GitHub-logins in kleine letters. Het token heeft daarvoor het
+  // organisatierecht "Members: Read-only" nodig; zonder dat recht antwoordt
+  // GitHub 403 (no-permission), bij een onbekend of geheim team 404 (no-team).
+  async function listTeamMembers(slug, config) {
+    const cfg = config || getConfig();
+    if (!cfg) return { ok: false, error: 'not-configured' };
+    // Wie er achter het token zit, rechtstreeks bij GitHub nagevraagd: niet
+    // de login die in deze browser bewaard staat (die is aan te passen).
+    const user = await request(cfg, 'GET', '/user');
+    if (!user.ok || !user.json || !user.json.login) return { ok: false, error: errorFor(user.status), status: user.status };
+    const me = String(user.json.login).toLowerCase();
+    const logins = [];
+    for (let page = 1; page <= 10; page++) {
+      const r = await request(cfg, 'GET', `/orgs/${encodeURIComponent(cfg.owner)}/teams/${encodeURIComponent(slug)}/members?per_page=100&page=${page}`);
+      if (!r.ok) {
+        const error = r.status === 403 ? 'no-permission' : r.status === 404 ? 'no-team' : errorFor(r.status);
+        return { ok: false, error, status: r.status };
+      }
+      const lijst = Array.isArray(r.json) ? r.json : [];
+      lijst.forEach((u) => { if (u && u.login) logins.push(String(u.login).toLowerCase()); });
+      if (lijst.length < 100) break;
+      if (page === 10) return { ok: false, error: 'too-many' };
+    }
+    return { ok: true, logins, me };
+  }
+
   // Bevestigt dat het token werkt én bij het databestand kan. Geeft de
   // ingelogde gebruikersnaam terug — ook de bron voor "wie ben ik", i.p.v.
   // een vrij-tekst naamveld — en doet dat ook als het repo onbereikbaar
@@ -452,6 +488,8 @@ const ObeyaGitBackend = (function () {
     setConfig,
     clearConfig,
     isConfigured,
+    confirmTeam,
+    listTeamMembers,
     testConnection,
     loadRemoteDataset,
     loadRemoteDocuments,

@@ -32,7 +32,27 @@ const ObeyaHistoryView = (function () {
 
   // Wie er mag beslissen, en waarom jij misschien niet: één zin.
   // alleenAfgewezen: er staat niets meer te bevestigen, alleen terug te draaien.
-  function permission(dataset, me, alleenAfgewezen) {
+  // De stand van het GitHub-team in één zin, voor de Agenda, het
+  // detailscherm en Instellingen → Team en opslag.
+  function gateText(dataset, gate) {
+    const team = `het team ${H.escapeHtml(gate.team)} op GitHub`;
+    if (gate.error === 'no-permission') return `De app kan ${team} niet lezen: je token mist het recht <strong>Members: Read-only</strong> bij de organisatie. Pas je token aan op GitHub; tot dan kun je niet bevestigen.`;
+    if (gate.error === 'no-team') return `De app vindt ${team} niet. Een eigenaar van de organisatie maakt het aan (zichtbaar, niet geheim).`;
+    if (gate.error === 'too-many') return `${team} heeft meer leden dan de app kan nagaan; niemand kan bevestigen.`;
+    if (!gate.logins) return gate.checking ? `Nagaan bij GitHub wie er in ${team} zit…` : `Nog niet bekend wie er in ${team} zit; haal het bord op of test de verbinding.`;
+    const namen = ObeyaData.confirmersFromLogins(dataset, gate.logins);
+    const wie = namen.length ? namen.join(', ') : `${gate.logins.length} ${gate.logins.length === 1 ? 'persoon' : 'personen'}`;
+    const jij = gate.login && gate.logins.includes(gate.login) ? ' Jij zit erin en mag bevestigen.' : '';
+    return `Bevestigen door ${team}: ${H.escapeHtml(wie)}.${jij}`;
+  }
+
+  function permission(dataset, me, alleenAfgewezen, gate) {
+    if (gate) {
+      if (ObeyaData.mayConfirm(dataset, me ? me.name : '', gate)) {
+        return { may: true, html: alleenAfgewezen ? 'Draai terug wat het overleg afwees, of laat het staan.' : 'Bevestig wat het overleg goedkeurt; wijs af met een reden.' };
+      }
+      return { may: false, html: gateText(dataset, gate) };
+    }
     const rollen = ObeyaData.confirmingRoles(dataset).map((r) => r.name);
     const door = rollen.length ? `${alleenAfgewezen ? 'Terugdraaien' : 'Bevestigen'} door de ${rollen.join(' of de ')}.` : 'Geen enkele rol mag bevestigen; stel dat in bij Instellingen → Rollen.';
     if (!me) return { may: false, html: `${H.escapeHtml(door)} Kies eerst wie je bent: <button type="button" class="doc-link" data-action="open-settings" data-section="team">Jij bent…</button>` };
@@ -110,12 +130,12 @@ const ObeyaHistoryView = (function () {
   // Bovenaan de Agenda; alleen als er iets te bevestigen is. Oudste eerst.
   // notice: wat er net besloten is, voor schermlezers (blijft ook staan als
   // het blok verdwijnt).
-  function agendaBlock(dataset, me, rejecting, notice, problems) {
+  function agendaBlock(dataset, me, rejecting, notice, problems, gate) {
     const open = ObeyaHistory.pending(dataset.changeLog);
     const afgewezen = ObeyaHistory.toRevert(dataset.changeLog);
     const melding = `<p class="sr-only" role="status" id="review-status">${H.escapeHtml(notice || '')}</p>`;
     if (!open.length && !afgewezen.length) return melding;
-    const perm = permission(dataset, me, !open.length);
+    const perm = permission(dataset, me, !open.length, gate);
     const kop = open.length ? `⏳ Te bevestigen (${open.length})` : `✕ Afgewezen, nog terug te draaien (${afgewezen.length})`;
     return `${melding}
       <section class="modal-section confirm-block" aria-labelledby="confirm-kop">
@@ -128,12 +148,12 @@ const ObeyaHistoryView = (function () {
   }
 
   // In het detailscherm: de wijzigingen die over dit item nog open staan.
-  function detailBlock(dataset, itemId, me, rejecting, problems) {
+  function detailBlock(dataset, itemId, me, rejecting, problems, gate) {
     const over = (e) => (e.items || []).some((i) => i.id === itemId);
     const open = ObeyaHistory.pending(dataset.changeLog).filter(over);
     const afgewezen = ObeyaHistory.toRevert(dataset.changeLog).filter(over);
     if (!open.length && !afgewezen.length) return '';
-    const perm = permission(dataset, me, !open.length);
+    const perm = permission(dataset, me, !open.length, gate);
     return `
       <div class="confirm-detail" role="group" aria-label="${open.length ? 'Te bevestigen' : 'Afgewezen'}">
         <p class="confirm-block__who" id="confirm-who-detail">${perm.html}</p>
@@ -273,5 +293,5 @@ const ObeyaHistoryView = (function () {
       </section>`;
   }
 
-  return { agendaBlock, detailBlock, permission, describe, itemHistory, timelineChanges, since, meetingButton, allToggle };
+  return { agendaBlock, detailBlock, permission, gateText, describe, itemHistory, timelineChanges, since, meetingButton, allToggle };
 })();

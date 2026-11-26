@@ -206,7 +206,7 @@ const ObeyaModal = (function () {
       } else if (type === 'displaySettings') {
         inner = viewDisplaySettings(dataset);
       } else if (type === 'settings') {
-        inner = viewSettings(dataset, gitTestResult, context.section, context, (extra || {}).me || null);
+        inner = viewSettings(dataset, gitTestResult, context.section, context, (extra || {}).me || null, (extra || {}).gate || null);
       } else if (type === 'printSheets') {
         inner = viewPrintSheets(dataset);
       } else if (type === 'inboxNew') {
@@ -299,7 +299,7 @@ const ObeyaModal = (function () {
     // de kopregel (advies UX-designer: niemand hoeft te scrollen).
     return {
       chips: `${statusChip(dataset, type, entity)} ${H.pendingBadge(entity.id)} ${chip('owner', 'Eigenaar', entity.owner, 'geen eigenaar')} ${chip('involved', 'Betrokken', betrokken.join(', '), 'niemand')}`,
-      panel: paneel + ObeyaHistoryView.detailBlock(dataset, entity.id, reviewExtra.me || null, reviewExtra.rejecting || null, reviewExtra.problems || null),
+      panel: paneel + ObeyaHistoryView.detailBlock(dataset, entity.id, reviewExtra.me || null, reviewExtra.rejecting || null, reviewExtra.problems || null, reviewExtra.gate || null),
     };
   }
 
@@ -1164,22 +1164,28 @@ const ObeyaModal = (function () {
   // Rollen (stap 2 van docs/wijzigingslog-plan.md): de lijst, en per rol of
   // die structuurwijzigingen mag bevestigen. Het mandaat per niveau komt met
   // idee 67.
-  function viewRolesConfig(dataset) {
+  function viewRolesConfig(dataset, gate) {
     const rollen = ObeyaData.getRoles(dataset);
+    // Met het GitHub-team beslist GitHub wie mag bevestigen: de vinkjes
+    // gelden dan niet en staan uit, zodat niemand zichzelf het recht geeft.
+    const viaGitHub = !!gate;
     const owners = ObeyaData.getOwnerOptions(dataset);
     const aantal = (id) => owners.filter((o) => ObeyaData.getPerson(dataset, o).roles.includes(id)).length;
     return `
-      <p class="modal__description">De rollen in het team. Wie een rol heeft met <strong>mag bevestigen</strong>, kan in het overleg wijzigingen aan de opbouw van het bord bevestigen (nieuw, verwijderd, verplaatst of omgezet). Dat is een afspraak, geen beveiliging. Wie welke rol heeft, leg je vast bij <button type="button" class="doc-link" data-action="settings-section" data-section="owners">Eigenaren</button>.</p>
+      ${viaGitHub
+    ? `<p class="modal__description">De rollen in het team. Wie welke rol heeft, leg je vast bij <button type="button" class="doc-link" data-action="settings-section" data-section="owners">Eigenaren</button>.</p>
+      <p class="settings__note" id="roles-confirm-note"><strong>Wie mag bevestigen, regelt GitHub:</strong> de leden van het team <strong>${H.escapeHtml(gate.team)}</strong> in de organisatie van het data-repo. Een eigenaar van de organisatie voegt mensen toe of haalt ze weg. De vinkjes hieronder gelden alleen voor het demobord.</p>`
+    : `<p class="modal__description">De rollen in het team. Wie een rol heeft met <strong>mag bevestigen</strong>, kan in het overleg wijzigingen aan de opbouw van het bord bevestigen (nieuw, verwijderd, verplaatst of omgezet). Dat is een afspraak, geen beveiliging. Wie welke rol heeft, leg je vast bij <button type="button" class="doc-link" data-action="settings-section" data-section="owners">Eigenaren</button>.</p>`}
       <ul class="item-list role-list">
         ${rollen.map((r) => `<li class="item-list__row" style="cursor:default;">
             <span class="item-list__name">${H.escapeHtml(r.name)}</span>
             <span class="muted item-list__extra">${aantal(r.id) ? `${aantal(r.id)} ${aantal(r.id) === 1 ? 'persoon' : 'personen'}` : 'nog niemand'}</span>
-            <label class="field-checkbox role-list__confirm"><input type="checkbox" data-role-confirm="${H.escapeHtml(r.id)}" ${r.canConfirm ? 'checked' : ''}> mag bevestigen</label>
+            <label class="field-checkbox role-list__confirm"><input type="checkbox" data-role-confirm="${H.escapeHtml(r.id)}" ${r.canConfirm ? 'checked' : ''}${viaGitHub ? ' disabled aria-describedby="roles-confirm-note"' : ''}> mag bevestigen</label>
             <button class="icon-btn" data-action="rename-role" data-role="${H.escapeHtml(r.id)}" title="Naam wijzigen" aria-label="Naam wijzigen van de rol ${H.escapeHtml(r.name)}">✎</button>
             <button class="icon-btn" data-action="remove-role" data-role="${H.escapeHtml(r.id)}" title="Verwijderen" aria-label="Verwijder de rol ${H.escapeHtml(r.name)}">✕</button>
           </li>`).join('') || '<li class="muted">Nog geen rollen.</li>'}
       </ul>
-      ${rollen.some((r) => r.canConfirm) ? '' : '<p class="settings__warning">Geen enkele rol mag bevestigen: dan kan niemand wijzigingen bevestigen.</p>'}
+      ${viaGitHub || rollen.some((r) => r.canConfirm) ? '' : '<p class="settings__warning">Geen enkele rol mag bevestigen: dan kan niemand wijzigingen bevestigen.</p>'}
       <form class="owner-add-form" data-action="add-role-form">
         <input id="f-new-role" type="text" placeholder="Naam van nieuwe rol" aria-label="Naam van nieuwe rol" maxlength="60" required>
         <button class="btn btn--small" type="submit">Toevoegen</button>
@@ -1187,7 +1193,7 @@ const ObeyaModal = (function () {
   }
 
   // "Jij bent": alleen voor deze browser, bovenaan Team en opslag.
-  function meFieldset(dataset, me) {
+  function meFieldset(dataset, me, gate) {
     const owners = ObeyaData.getOwnerOptions(dataset);
     const gekozen = me && me.source === 'chosen' ? me.name : '';
     const uitleg = !me
@@ -1203,7 +1209,8 @@ const ObeyaModal = (function () {
           <option value="">${me && me.source === 'github' ? `Automatisch: ${H.escapeHtml(me.name)}` : 'Kies je naam…'}</option>
           ${owners.map((o) => `<option value="${H.escapeHtml(o)}" ${o === gekozen ? 'selected' : ''}>${H.escapeHtml(o)}</option>`).join('')}
         </select>
-        <p class="field-hint">${uitleg}${me ? ` ${rollen.length ? `Rol: ${H.escapeHtml(rollen.join(', '))}.` : 'Nog geen rol; die leg je vast bij Eigenaren.'}${ObeyaData.canConfirm(dataset, me.name) ? ' Je mag wijzigingen bevestigen.' : ''}` : ''} Alleen voor deze browser.</p>
+        <p class="field-hint">${uitleg}${me ? ` ${rollen.length ? `Rol: ${H.escapeHtml(rollen.join(', '))}.` : 'Nog geen rol; die leg je vast bij Eigenaren.'}${!gate && ObeyaData.canConfirm(dataset, me.name) ? ' Je mag wijzigingen bevestigen.' : ''}` : ''} Alleen voor deze browser.</p>
+        ${gate ? `<p class="field-hint" id="confirm-team-status">${ObeyaHistoryView.gateText(dataset, gate)}</p>` : ''}
       </div>`;
   }
 
@@ -1708,16 +1715,16 @@ const ObeyaModal = (function () {
       </div>`;
   }
 
-  function viewSettings(dataset, gitTestResult, sectionId, context, me) {
+  function viewSettings(dataset, gitTestResult, sectionId, context, me, gate) {
     const actief = SETTINGS_SECTIONS.find((s) => s.id === sectionId) || SETTINGS_SECTIONS[0];
     const inhoud = {
       board: () => viewBoardSettings(dataset, true),
       owners: () => viewOwnersConfig(dataset, true, (context || {}).person),
-      roles: () => viewRolesConfig(dataset),
+      roles: () => viewRolesConfig(dataset, gate),
       roleGroups: () => viewRoleGroupsConfig(dataset),
       statusLabels: () => viewStatusLabelsConfig(dataset, true),
       display: () => viewDisplaySettings(dataset, true),
-      team: () => meFieldset(dataset, me) + viewGitConfig(gitTestResult, true),
+      team: () => meFieldset(dataset, me, gate) + viewGitConfig(gitTestResult, true),
       data: () => settingsDataSection(),
     }[actief.id]();
     return `

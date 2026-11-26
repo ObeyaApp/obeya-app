@@ -1737,6 +1737,7 @@ body.presentation-mode .cv-vision p { font-size: 18px; }
 .person-form__actions { display: flex; gap: 8px; }
 .role-list__confirm { white-space: nowrap; }
 .settings__warning { color: var(--red); font-weight: 600; }
+.settings__note { padding: 8px 12px; border-left: 3px solid var(--canal); background: var(--panel-soft); }
 .me-field { margin-bottom: 18px; }
 /* Eigenaar en betrokkenen als knop in de kopregel van een detailscherm
    (idee 74): de waarde is de knop, eronder klapt een paneel open. */

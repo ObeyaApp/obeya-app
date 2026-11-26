@@ -1179,6 +1179,19 @@ const ObeyaData = (function () {
     })).filter((g) => g.names.length);
   }
 
+  // Mag deze persoon bevestigen? Zonder gate gelden de rollen in de app. Met
+  // een gate (het GitHub-team, zie ObeyaState.getConfirmGate) alleen wie met
+  // een GitHub-login in dat team verbonden is; de rollen tellen dan niet.
+  function mayConfirm(dataset, name, gate) {
+    if (!gate) return canConfirm(dataset, name);
+    return !!(gate.login && Array.isArray(gate.logins) && gate.logins.includes(String(gate.login).toLowerCase()));
+  }
+
+  // De namen uit de eigenarenlijst bij de logins van het GitHub-team.
+  function confirmersFromLogins(dataset, logins) {
+    return (logins || []).map((l) => personForLogin(dataset, l)).filter(Boolean);
+  }
+
   // Wie er mag bevestigen, voor de zin "Bevestigen door …".
   function confirmingRoles(dataset) {
     return getRoles(dataset).filter((r) => r.canConfirm);
@@ -2882,6 +2895,8 @@ const ObeyaData = (function () {
     personForLogin,
     canConfirm,
     confirmingRoles,
+    mayConfirm,
+    confirmersFromLogins,
     ownersByRole,
     DISPLAY_DEFAULTS,
     DETAIL_LEVELS,

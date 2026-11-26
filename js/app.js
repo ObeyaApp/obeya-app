@@ -172,7 +172,7 @@
         : view === 'help'
           ? ObeyaHelpView.render(ObeyaState.getHelpPage(), { back: ObeyaToolbar.viewLabel(ObeyaState.getViewBeforeHelp()) })
           : ObeyaBoard.render(dataset, filters, view, ObeyaState.getZoomLevel(), ObeyaState.getMatrixMode(),
-            { agendaTop: view === 'agenda' ? ObeyaHistoryView.agendaBlock(dataset, ObeyaState.getMe(), ObeyaState.getRejectingChange(), ObeyaState.getReviewNotice(), ObeyaState.getRevertProblems()) + ObeyaInboxView.block(ObeyaState.getInbox(), ObeyaState.isGitConfigured(), ObeyaState.landedFromInbox) : '',
+            { agendaTop: view === 'agenda' ? ObeyaHistoryView.agendaBlock(dataset, ObeyaState.getMe(), ObeyaState.getRejectingChange(), ObeyaState.getReviewNotice(), ObeyaState.getRevertProblems(), ObeyaState.getConfirmGate()) + ObeyaInboxView.block(ObeyaState.getInbox(), ObeyaState.isGitConfigured(), ObeyaState.landedFromInbox) : '',
               agendaBottom: view === 'agenda' ? ObeyaHistoryView.meetingButton(dataset) : '',
               timeline: view === 'timeline' && ObeyaState.getTimelineMode() !== 'notes' ? {
                 mode: ObeyaState.getTimelineMode(),
@@ -180,7 +180,7 @@
                 since: ObeyaHistoryView.since(dataset),
                 toggleAll: ObeyaHistoryView.allToggle(ObeyaState.getShowAllChanges(), 'timeline'),
               } : { mode: 'notes' } })}</main>
-      ${ObeyaModal.render(dataset, selection, ObeyaState.getEditingNoteId(), ObeyaState.getGitTestResult(), ObeyaState.getPendingMerge(), ObeyaState.getReview(), { me: ObeyaState.getMe(), rejecting: ObeyaState.getRejectingChange(), problems: ObeyaState.getRevertProblems(), showAll: ObeyaState.getShowAllChanges() })}
+      ${ObeyaModal.render(dataset, selection, ObeyaState.getEditingNoteId(), ObeyaState.getGitTestResult(), ObeyaState.getPendingMerge(), ObeyaState.getReview(), { me: ObeyaState.getMe(), gate: ObeyaState.getConfirmGate(), rejecting: ObeyaState.getRejectingChange(), problems: ObeyaState.getRevertProblems(), showAll: ObeyaState.getShowAllChanges() })}
     `;
 
     openDetails.forEach((id) => { const d = document.getElementById(id); if (d) d.open = true; });
@@ -498,6 +498,8 @@
   const REVIEW_FOUT = {
     'no-me': 'Kies eerst wie je bent, bij Instellingen → Team en opslag.',
     'not-allowed': 'Jouw rol mag geen wijzigingen bevestigen.',
+    'not-in-team': 'Je zit niet in het team Bevestigers op GitHub. Wie erin zit, regelt een eigenaar van de organisatie.',
+    'team-unknown': 'De app kon bij GitHub niet nagaan of je mag bevestigen. Kijk bij Instellingen → Team en opslag.',
     'not-pending': 'Over deze wijziging is al beslist.',
     'not-rejected': 'Deze wijziging is niet (meer) afgewezen.',
     'no-reason': 'Geef een reden; de maker ziet hem.',

@@ -33,6 +33,10 @@ Een wijziging aan de opbouw van het bord moet in het overleg bevestigd worden: i
 - De app legt vast wie besliste, met welke rol en wanneer. Dat is een afspraak, geen beveiliging.
 :::
 
+::: gewijzigd 2026-11-26
+Met het team verbonden mag alleen bevestigen wie in het team **bevestigers** op GitHub zit; de rollen in de app tellen dan niet. De app legt je GitHub-login vast bij de beslissing. Zit je er niet in, dan zie je de knoppen uitgeschakeld en staat erboven wie het wel mag.
+:::
+
 # Terugdraaien na afwijzen
 
 ::: nieuw 2026-11-08

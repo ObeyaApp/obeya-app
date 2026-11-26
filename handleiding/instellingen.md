@@ -20,6 +20,10 @@ Het **pictogram** is standaard een neutraal Obeya-pictogram. Het pictogram van d
 - **Rollen:** de rollen in het team, zoals Teamcoördinator en Product Owner ODV. Per rol zet je aan of die **mag bevestigen**: in het overleg wijzigingen aan de opbouw van het bord bevestigen (nieuw, verwijderd, verplaatst, omgezet). Standaard mogen dat de product owner en de teamcoördinator. Dat is een afspraak, geen beveiliging.
 :::
 
+::: gewijzigd 2026-11-26
+Ben je verbonden met het team, dan bepaalt **GitHub** wie mag bevestigen: de leden van het team **bevestigers** in de organisatie van het data-repo. De vinkjes **mag bevestigen** staan dan uit; ze gelden alleen nog voor het demobord. Zo kan niemand zichzelf in de app het recht geven. Wie het databestand rechtstreeks op GitHub bewerkt, kan het nog omzeilen, maar dat staat op naam in de geschiedenis van het data-repo. Wie erin zit, regelt een eigenaar van de organisatie op GitHub. Bij *Team en opslag* zie je wie er in het team zit en of jij mag bevestigen.
+:::
+
 ::: nieuw 2026-11-23
 - **Groepen:** rollen die bij elkaar horen, bijvoorbeeld **Sturing** voor de senioren en de teamcoördinator. Per groep vink je de rollen aan; een rol mag in meer groepen staan. Bij **Betrokkenen** in een formulier vink je dan iedereen uit de groep in één keer aan. Een groep verwijderen haalt geen rollen en geen betrokkenen weg.
 :::

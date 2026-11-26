@@ -158,7 +158,7 @@ const ObeyaState = (function () {
 
   async function init() {
     stukken = leesStukken();
-    if (ObeyaGitBackend.isConfigured()) loadInboxQuietly();
+    if (ObeyaGitBackend.isConfigured()) { loadInboxQuietly(); refreshConfirmTeamQuietly(); }
     if (!restoreFromStorage()) {
       restoredFromStorage = false;
       lastSavedAt = null;
@@ -442,6 +442,7 @@ const ObeyaState = (function () {
 
   function saveGitConfig(fields) {
     ObeyaGitBackend.setConfig(fields);
+    resetConfirmTeam();
     gitTestResult = null;
     notify();
   }
@@ -449,6 +450,7 @@ const ObeyaState = (function () {
   function clearGitConfig() {
     clearGitBase();
     ObeyaGitBackend.clearConfig();
+    resetConfirmTeam();
     gitTestResult = null;
     notify();
   }
@@ -465,6 +467,7 @@ const ObeyaState = (function () {
       ObeyaGitBackend.setIdentity(null);
     }
     notify();
+    if (gitTestResult.ok) await refreshConfirmTeam();
     return gitTestResult;
   }
 
@@ -677,6 +680,7 @@ const ObeyaState = (function () {
       setGitStatus({ busy: false, lastError: null, lastSyncedAt: new Date(), notice: metWaarschuwingen('Laatste versie van het team opgehaald') });
       notify();
       loadInboxQuietly();
+      refreshConfirmTeamQuietly();
       return { ok: true, warnings: toegepast.warnings };
     }
 
@@ -692,6 +696,7 @@ const ObeyaState = (function () {
     setGitStatus({ busy: false, lastError: null, lastSyncedAt: new Date(), notice: metWaarschuwingen(`${teamwijzigingenTekst(samen.theirsChanges)}; jouw wijzigingen zijn nog niet gedeeld`) });
     notify();
     loadInboxQuietly();
+    refreshConfirmTeamQuietly();
     return { ok: true, mergedFromTeam: samen.theirsChanges, warnings: toegepast.warnings };
   }
 
@@ -753,6 +758,62 @@ const ObeyaState = (function () {
 
   // Op de achtergrond (na opstarten en ophalen): een fout komt in de inbox
   // terecht, nooit in het ophalen van het bord zelf.
+  // "Mag bevestigen" via GitHub (25 november 2026): verbonden met het
+  // teamrepo, dan bepaalt het team Bevestigers in de GitHub-organisatie wie
+  // mag bevestigen, niet de rollen in de app. Alleen in het geheugen: bij elk
+  // opstarten, ophalen en testen van de verbinding opnieuw nagevraagd.
+  const LEEG_TEAM = { checking: false, logins: null, me: '', error: '' };
+  let confirmTeamState = { ...LEEG_TEAM };
+  // Elke navraag krijgt een nummer; een trager, ouder antwoord overschrijft
+  // nooit een nieuwer (bijv. opstarten en ophalen vlak na elkaar).
+  let confirmTeamRonde = 0;
+
+  // Na een ander token of repo geldt de oude lijst niet meer.
+  function resetConfirmTeam() {
+    confirmTeamRonde += 1;
+    confirmTeamState = { ...LEEG_TEAM };
+  }
+
+  function confirmTeamSlug() {
+    return typeof ObeyaGitBackend.confirmTeam === 'function' ? ObeyaGitBackend.confirmTeam() : '';
+  }
+
+  // null: geen gate, de rollen gelden. Anders { team, login, logins, error,
+  // checking }; logins is null zolang het niet bekend is.
+  function getConfirmGate() {
+    const team = confirmTeamSlug();
+    if (!team) return null;
+    // De login die GitHub bij de laatste navraag gaf, niet de bewaarde.
+    return { team, login: confirmTeamState.me, logins: confirmTeamState.logins, error: confirmTeamState.error, checking: confirmTeamState.checking };
+  }
+
+  async function refreshConfirmTeam() {
+    const team = confirmTeamSlug();
+    if (!team || typeof ObeyaGitBackend.listTeamMembers !== 'function') return;
+    const ronde = ++confirmTeamRonde;
+    confirmTeamState = { ...confirmTeamState, checking: true };
+    notify();
+    let r;
+    try {
+      r = await ObeyaGitBackend.listTeamMembers(team);
+    } catch (err) {
+      r = { ok: false, error: 'network' };
+    }
+    // Zonder netwerk blijft de laatst bekende lijst gelden; elke andere fout
+    // (geen recht, geen team) betekent: niemand mag, tot het weer klopt.
+    if (ronde !== confirmTeamRonde) return;
+    confirmTeamState = r.ok
+      ? { checking: false, logins: r.logins, me: r.me || '', error: '' }
+      : r.error === 'network'
+        ? { ...confirmTeamState, checking: false, error: 'network' }
+        : { ...LEEG_TEAM, error: r.error || 'unknown' };
+    notify();
+  }
+
+  function refreshConfirmTeamQuietly() {
+    refreshConfirmTeam().catch((err) => console.warn('Bevestigers konden niet worden opgehaald:', err));
+  }
+
   function loadInboxQuietly() {
     if (typeof ObeyaGitBackend.listInboxIssues !== 'function') return;
     loadInbox().catch((err) => {
@@ -1432,6 +1493,13 @@ const ObeyaState = (function () {
 
   function reviewer() {
     const me = getMe();
+    const gate = getConfirmGate();
+    if (gate) {
+      // Het GitHub-team beslist; op naam van de persoon bij die login.
+      if (!ObeyaData.mayConfirm(dataset, '', gate)) return { error: gate.logins ? 'not-in-team' : 'team-unknown' };
+      const naam = ObeyaData.personForLogin(dataset, gate.login) || (me ? me.name : '');
+      return { by: { ...(naam ? { person: naam, roles: ObeyaData.rolesOf(dataset, naam).map((r) => r.name) } : {}), login: gate.login, via: 'github-team' } };
+    }
     if (!me) return { error: 'no-me' };
     if (!ObeyaData.canConfirm(dataset, me.name)) return { error: 'not-allowed' };
     const login = gitLogin();
@@ -1833,6 +1901,8 @@ const ObeyaState = (function () {
     getGitStatus,
     getGitTestResult,
     getGitIdentity,
+    getConfirmGate,
+    refreshConfirmTeam,
     getMe,
     setMe,
     confirmChange,
