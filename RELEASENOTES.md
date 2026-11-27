@@ -4,6 +4,11 @@ Wat er per versie nieuw of anders is in de Obeya-app.
 
 ## Nog niet uitgebracht
 
+## 0.56.0 — 2026-11-27
+
+### Gewijzigd
+- **Het detailscherm in kaarten** — elk onderdeel (meetbare resultaten met wat eraan bijdraagt, losse acties, koppelingen, notities, geschiedenis) staat in een eigen kaart, zodat je sneller ziet wat er staat. "Te bevestigen" valt op in oranje.
+
 ## 0.55.0 — 2026-11-27
 
 ### Nieuw

@@ -2481,3 +2481,22 @@ body.presentation-mode .status-legend .status-pill--quiet { font-size: 20px; }
 /* In Samenhang staat de statuslegenda bij de lijnlegenda, rechts. */
 .canvas-legend .status-legend { margin: 0; }
 .canvas-legend .status-legend__list { left: auto; right: 0; }
+
+/* Het detailscherm in kaarten (27 november 2026, advies UX-ontwerper): elke
+   hoofdgroep (keten, losse acties, koppelingen, notities, geschiedenis) een
+   witte kaart op een lichtgrijze achtergrond, met een duidelijkere kop.
+   Binnen een kaart geen kaders meer, maar inspringen met een lijn links.
+   "Te bevestigen" is de enige gekleurde kaart; omzetten krijgt geen kaart.
+   De rand is decoratief (de tekst draagt de inhoud), dus geen 3:1 nodig. */
+.modal--detail { background: var(--panel-soft); }
+.modal--detail .modal-section { margin: 0 0 16px; padding: 14px 16px 16px; border: 1px solid #c5cfcc; border-radius: var(--radius); background: var(--panel); }
+.modal--detail .modal-section__head { flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.modal--detail .modal-section__head h3 { flex: 1 1 220px; font-size: 14px; color: var(--ink); }
+.modal--detail .modal-section.convert-row { padding: 0; border: 0; background: none; }
+.modal--detail .chain { padding: 0; border: 0; }
+.modal--detail .chain-list { gap: 16px; }
+.modal--detail .chain--loose { margin-top: 16px; padding-top: 12px; border-top: 1px dashed #c5cfcc; border-radius: 0; }
+.modal--detail .confirm-detail { margin: 0 0 16px; border: 1px solid var(--amber); border-left: 4px solid var(--amber); border-radius: var(--radius); background: var(--amber-bg); }
+@media (max-width: 600px) {
+  .modal--detail .modal-section { padding: 12px; }
+}

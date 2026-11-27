@@ -222,9 +222,12 @@ const ObeyaModal = (function () {
       console.error(err);
       inner = `<p class="error-text">Er ging iets mis bij het tonen van dit item. Sluit het venster en probeer opnieuw.</p>`;
     }
+    // Het detailscherm van een item: elke hoofdgroep een kaart (advies
+    // UX-ontwerper, 27 november 2026). Bewerken en instellingen niet.
+    const detail = mode === 'view' && ['theme', 'objective', 'measurableResult', 'project', 'action'].includes(type);
     return `
       <div class="overlay" data-close-overlay>
-        <div class="modal" role="dialog" aria-modal="true" data-stop-close>
+        <div class="modal${detail ? ' modal--detail' : ''}" role="dialog" aria-modal="true" data-stop-close>
           ${inner}
         </div>
       </div>`;
