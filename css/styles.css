@@ -2456,3 +2456,28 @@ body.presentation-mode .agenda-owner, body.presentation-mode .gap-group > summar
 .sheet--wall .pw-note--result { gap: .12em; }
 .sheet--wall .pw-note--result .pw-note__meta { max-height: 3.5em; overflow: hidden; row-gap: .2em; }
 .sheet--wall .pw-result__goal--kort { -webkit-line-clamp: 1; }
+
+/* Rustige status (26 november 2026): een eigen vorm per status in plaats van
+   het bolletje; wat op koers, bezig of klaar is, alleen als symbool zonder
+   vlak. Het woord staat voor schermlezers in .sr-only en in de tooltip. */
+.status-sym { display: inline-flex; align-items: center; justify-content: center; width: 1.1em; height: 1.1em; font-weight: 700; line-height: 1; }
+.status-pill--sym .status-sym { margin-right: 2px; }
+/* Klaar: het vinkje wit in een gevuld groen vakje. */
+.status-done .status-sym { border-radius: 3px; background: var(--green); color: #fff; font-size: .85em; width: 1.3em; height: 1.3em; }
+.status-pill--quiet { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 24px; padding: 0; background: transparent; font-size: 16px; line-height: 1; }
+body.presentation-mode .status-pill--quiet { font-size: 20px; }
+/* In Samenhang staat het stille symbool op dezelfde regel als de naam. */
+.cv-mr:has(> .status-pill--quiet) > .cv-mr__name, .cv-action:has(> .status-pill--quiet) > .cv-action__name { grid-row: 1; grid-column: 2; }
+.cv-mr:has(> .status-pill--quiet) > .cv-tag, .cv-action:has(> .status-pill--quiet) > .muted { grid-row: 2; }
+/* De legenda klapt uit als venstertje over de inhoud, zodat niets verspringt;
+   in de kamermodus staat hij open in de regel, groter. */
+.status-legend { position: relative; display: inline-block; margin: 0 0 8px; font-size: 13px; }
+.status-legend summary { cursor: pointer; color: var(--grey); }
+.status-legend__list { position: absolute; z-index: 30; top: calc(100% + 4px); left: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; width: max-content; max-width: min(90vw, 640px); margin: 0; padding: 8px 12px; list-style: none; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); box-shadow: 0 4px 14px rgba(0, 0, 0, .12); }
+.status-legend__list li { display: inline-flex; align-items: center; gap: 4px; }
+body.presentation-mode .status-legend { font-size: 18px; }
+body.presentation-mode .status-legend__list { position: static; box-shadow: none; border: 0; padding: 4px 0; max-width: none; }
+body.presentation-mode .status-legend .status-pill--quiet { font-size: 20px; }
+/* In Samenhang staat de statuslegenda bij de lijnlegenda, rechts. */
+.canvas-legend .status-legend { margin: 0; }
+.canvas-legend .status-legend__list { left: auto; right: 0; }

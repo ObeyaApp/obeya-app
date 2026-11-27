@@ -1573,6 +1573,8 @@ const ObeyaModal = (function () {
           </div>
         </div>
         <div class="field field--checkbox"><label><input type="checkbox" id="f-display-tilt" ${d.tilt ? 'checked' : ''}> Briefjes iets scheef, als op een muur</label></div>
+        <div class="field field--checkbox"><label><input type="checkbox" id="f-display-quiet" aria-describedby="f-display-quiet-hint" ${d.quietStatus ? 'checked' : ''}> Rustige status op Bord en Samenhang</label>
+          <p class="field-hint" id="f-display-quiet-hint">Op de kaarten alleen een symbool bij Op koers, Bezig en Klaar; het woord alleen bij Aandacht nodig, Buiten koers en Niet beoordeeld. Met een legenda. Lijsten, het detailscherm en de muurvellen blijven zoals ze zijn.</p></div>
         <fieldset class="print-form__group">
           <legend>Tabbladen</legend>
           <p class="field-hint" id="f-display-views-hint">Zet een tabblad tijdelijk uit als het team het (nog) niet gebruikt. Er gaat niets verloren: zet het vinkje terug en het tabblad is er weer. Het Bord staat altijd aan.</p>

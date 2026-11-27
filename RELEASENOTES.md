@@ -4,6 +4,11 @@ Wat er per versie nieuw of anders is in de Obeya-app.
 
 ## Nog niet uitgebracht
 
+## 0.55.0 — 2026-11-27
+
+### Nieuw
+- **Rustige status** op Bord en Samenhang, in *Instellingen → Weergave*: een eigen symbool per status, het woord alleen bij een afwijking, en een legenda. Standaard uit.
+
 ## 0.54.0 — 2026-11-26
 
 ### Gewijzigd

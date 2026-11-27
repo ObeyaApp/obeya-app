@@ -32,15 +32,50 @@ const ObeyaUI = (function () {
   // opts.entityType laat het label per entiteitstype verschillen (bv.
   // "groen" is bij een project "Klaar", bij een doel "Op koers") zonder de
   // onderliggende waarde/kleur te veranderen — zie ObeyaData.statusLabelFor.
+  // Een eigen vorm per status, ook zonder kleur te onderscheiden; dezelfde
+  // symbolen als op de muurvellen.
+  // Klaar is een vinkje in een gevuld vakje (CSS: .status-done .status-sym),
+  // zodat het niet op het losse vinkje van Op koers lijkt.
+  const STATUS_SYMBOL = { green: '✓', amber: '▲', red: '✖', grey: '?', blue: '▶', done: '✓' };
+  // Wat geen aandacht vraagt: bij een rustige status alleen het symbool.
+  const QUIET_STATUSES = ['green', 'blue', 'done'];
+
+  function quietStatusOn() {
+    return !!(activeDataset && ObeyaData.getDisplaySettings(activeDataset).quietStatus);
+  }
+
+  // opts.card: een kaart op Bord of Samenhang. Staat "Rustige status" aan,
+  // dan krijgt daar elke status een symbool in plaats van het bolletje, en
+  // verdwijnt het woord bij wat op koers, bezig of klaar is (advies Obeya-
+  // coach: alleen de afwijking valt op). Het woord blijft voor schermlezers
+  // en in de tooltip.
   function statusPill(status, opts) {
     opts = opts || {};
     const meta = ObeyaData.STATUS_META[status] || ObeyaData.STATUS_META.grey;
     const key = ObeyaData.STATUS_META[status] ? status : 'grey';
     const label = ObeyaData.statusLabelFor(opts.entityType, key, activeDataset);
     const size = opts.compact ? ' status-pill--compact' : '';
+    if (opts.card && quietStatusOn()) {
+      const sym = `<span class="status-sym" aria-hidden="true">${STATUS_SYMBOL[key]}</span>`;
+      return QUIET_STATUSES.includes(key)
+        ? `<span class="status-pill status-pill--quiet status-${key}" title="${escapeHtml(label)}">${sym}<span class="sr-only">${escapeHtml(label)}</span></span>`
+        : `<span class="status-pill status-pill--sym status-${key}${size}" title="${escapeHtml(label)}">${sym}${escapeHtml(label)}</span>`;
+    }
     return `<span class="status-pill status-${key}${size}" title="${escapeHtml(label)} — ${escapeHtml(meta.en)} (${key})">
       <span class="status-dot" aria-hidden="true"></span>${escapeHtml(label)}
     </span>`;
+  }
+
+  // De legenda bij een rustige status: de symbolen met hun woord, één keer.
+  // Een <details>, zodat hij geen ruimte kost; in de kamermodus staat hij open.
+  function statusLegend() {
+    if (!quietStatusOn()) return '';
+    const regels = ['green', 'blue', 'done', 'amber', 'red', 'grey'].map((k) => {
+      // Eén woord per status: Bezig en Klaar zoals bij werk, de rest zoals bij een doel.
+      const woorden = ObeyaData.statusLabelFor(['blue', 'done'].includes(k) ? 'project' : 'objective', k, activeDataset);
+      return `<li><span class="status-pill ${QUIET_STATUSES.includes(k) ? 'status-pill--quiet' : 'status-pill--sym status-pill--compact'} status-${k}"><span class="status-sym" aria-hidden="true">${STATUS_SYMBOL[k]}</span></span> ${escapeHtml(woorden)}</li>`;
+    });
+    return `<details class="status-legend" id="status-legend"><summary>Legenda</summary><ul class="status-legend__list" aria-label="Betekenis van de statussymbolen">${regels.join('')}</ul></details>`;
   }
 
   // De punaise: op de agenda van het volgende overleg (idee 26). Op een kaart
@@ -474,6 +509,7 @@ const ObeyaUI = (function () {
     escapeHtml,
     nl2br,
     statusPill,
+    statusLegend,
     statusSelect,
     coverageLabel,
     coverageSentence,

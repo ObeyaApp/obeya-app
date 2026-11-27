@@ -35,6 +35,10 @@ Ben je verbonden met het team, dan bepaalt **GitHub** wie mag bevestigen: de led
 Onder **Weergave** zet je ook **tabbladen** tijdelijk uit, voor het hele team, bijvoorbeeld een tabblad dat het team (nog) niet gebruikt. Er gaat niets verloren: zet het vinkje terug en het tabblad is er weer. Het Bord staat altijd aan. Opent iemand een uitgezet tabblad via een gedeeld adres, dan staat het zolang in de balk.
 :::
 
+::: nieuw 2026-11-27
+Ook onder **Weergave**: **Rustige status op Bord en Samenhang**, standaard uit. Staat het aan, dan krijgt elke status op de kaarten een eigen symbool: ✓ Op koers, ▶ Bezig, een wit vinkje in een groen vakje voor Klaar, ▲ Aandacht nodig, ✖ Buiten koers, ? Niet beoordeeld. Bij Op koers, Bezig en Klaar staat dan alleen het symbool; bij een afwijking blijft het woord erbij. Zo vallen de afwijkingen meer op. Boven het bord staat een **Legenda**, in de kamermodus altijd open. Lijsten, het detailscherm en de muurvellen blijven zoals ze zijn, en een schermlezer leest het woord altijd voor. Of het aan gaat, besluit het team.
+:::
+
 # Alleen voor deze browser
 
 - **Team en opslag:** de verbinding met het data-repo; zie [samenwerken](pagina:samenwerken). Bovenaan kies je **Jij bent**: wie er in deze browser werkt. Het wijzigingslog legt wijzigingen op die naam vast, en je naam staat in de teamchip rechtsboven. Kies je niets, dan herkent de app je aan je GitHub-login als die bij een persoon is ingevuld.

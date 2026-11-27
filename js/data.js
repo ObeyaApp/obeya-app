@@ -917,6 +917,10 @@ const ObeyaData = (function () {
     defaultDetail: 'standard', // 'head' | 'standard' | 'detail'
     tilt: true,
     chainLayout: 'rows', // 'rows' (thema's onder elkaar) | 'org' (organogram) | 'mindmap'
+    // Rustige status (26 november 2026): op de kaarten van Bord en Samenhang
+    // alleen een symbool bij wat op koers, bezig of klaar is; het woord alleen
+    // bij een afwijking. Standaard uit: het team besluit of het aan gaat.
+    quietStatus: false,
   };
   const DETAIL_LEVELS = ['head', 'standard', 'detail'];
   // Tabbladen die het team tijdelijk kan uitzetten (idee 83). Het Bord kan niet uit.
@@ -942,6 +946,7 @@ const ObeyaData = (function () {
       chainLayout: eigen.chainLayout === 'columns' ? 'org'
         : (CHAIN_LAYOUTS.includes(eigen.chainLayout) ? eigen.chainLayout : DISPLAY_DEFAULTS.chainLayout),
       hiddenViews: cleanHiddenViews(eigen.hiddenViews) || [],
+      quietStatus: typeof eigen.quietStatus === 'boolean' ? eigen.quietStatus : DISPLAY_DEFAULTS.quietStatus,
     };
   }
 
@@ -961,6 +966,7 @@ const ObeyaData = (function () {
       tilt: typeof f.tilt === 'boolean' ? f.tilt : huidig.tilt,
       chainLayout: CHAIN_LAYOUTS.includes(f.chainLayout) ? f.chainLayout : huidig.chainLayout,
       hiddenViews: cleanHiddenViews(f.hiddenViews) || huidig.hiddenViews,
+      quietStatus: typeof f.quietStatus === 'boolean' ? f.quietStatus : huidig.quietStatus,
     };
     return config.display;
   }

@@ -48,6 +48,7 @@ const ObeyaBoard = (function () {
     }
     // Een nieuw thema voeg je toe waar de thema's staan: achteraan het bord.
     return `<p id="board-drag-hint" class="sr-only">Sleep een doel of een thema om de volgorde te veranderen. Met het toetsenbord: Alt+pijl omhoog of omlaag verschuift een doel binnen zijn thema, Alt+pijl links of rechts zet het in het thema ernaast; op de kop van een thema verschuift Alt+pijl links of rechts het thema.</p>
+      ${H.statusLegend()}
       <div class="board" data-sort="board-themes">${themes.map((theme) => themeColumn(theme, filters, zoomLevel)).join('')}
       <div class="theme-col theme-col--add"><button class="btn btn--ghost theme-col__add" data-action="new-theme">+ Thema</button></div></div>`;
   }
@@ -83,7 +84,7 @@ const ObeyaBoard = (function () {
     return `
       <article class="card objective-card" data-id="${H.escapeHtml(objective.id)}" data-open="objective:${objective.id}" tabindex="0" role="button" aria-label="${H.escapeHtml(objective.title)}" aria-roledescription="versleepbaar doel" aria-describedby="board-drag-hint">
         <div class="card__top">
-          ${H.statusPill(objective.status, { compact: true, entityType: 'objective' })}
+          ${H.statusPill(objective.status, { compact: true, entityType: 'objective', card: true })}
           ${tp ? '<span class="tp-badge" title="Bevat items uit het teamplan">TP</span>' : ''}
           ${H.pendingBadge(objective.id)}
           ${H.flagButton(objective, { compact: true, className: 'card__flag' })}

@@ -184,6 +184,8 @@
     `;
 
     openDetails.forEach((id) => { const d = document.getElementById(id); if (d) d.open = true; });
+    // In de kamermodus staat de legenda van de rustige status altijd open.
+    if (ObeyaState.isPresentationMode()) { const legenda = document.getElementById('status-legend'); if (legenda) legenda.open = true; }
 
     let focusRestored = false;
     if (focusInfo) {
@@ -1680,6 +1682,9 @@
       // Het statuspaneel van het team sluit eerst, met de focus op de chip.
       const paneel = document.querySelector('.team-status__menu[open]');
       if (paneel) { paneel.open = false; paneel.querySelector('summary').focus(); return; }
+      // De legenda van de rustige status, als de focus erin staat.
+      const legenda = e.target.closest && e.target.closest('.status-legend[open]');
+      if (legenda && !ObeyaState.isPresentationMode()) { legenda.open = false; legenda.querySelector('summary').focus(); return; }
       // Een open paneel onder een knop in de kopregel sluit eerst, en het veld
       // voor de reden van afwijzen ook.
       if (closeChip()) return;
@@ -2048,6 +2053,7 @@
         tilt: !!document.getElementById('f-display-tilt').checked,
         chainLayout: val('f-display-layout'),
         hiddenViews: Array.from(displayForm.querySelectorAll('input[name="display-view"]:not(:checked)'), (i) => i.value),
+        quietStatus: !!(document.getElementById('f-display-quiet') || {}).checked,
       };
       ObeyaState.mutate((ds) => ObeyaData.setDisplaySettings(ds, fields), 'weergave van de muur');
       // Het nieuwe standaardniveau en de nieuwe indeling meteen laten gelden.

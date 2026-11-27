@@ -61,6 +61,10 @@ De status van een thema en een doel stel je niet zelf in. De app telt hem op uit
 
 Een status is nooit alleen een kleur: er staat altijd een symbool en een woord bij.
 
+::: gewijzigd 2026-11-27
+Kiest het team voor een [rustige status](pagina:instellingen), dan staat op de kaarten bij Op koers, Bezig en Klaar alleen een symbool, met een legenda. Het woord blijft bij wat aandacht vraagt: Aandacht nodig, Buiten koers en Niet beoordeeld. Zo valt de afwijking op, en niet elke status even hard.
+:::
+
 Zo doe je dat in de app: [status en eigenaar](pagina:items#status-en-eigenaar), en de [beoordelingsronde](pagina:overleg#de-beoordelingsronde) voor wat nog grijs is.
 
 # Rood mag, rood zonder aanpak niet

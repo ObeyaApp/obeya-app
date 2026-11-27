@@ -228,7 +228,7 @@ const ObeyaCanvas = (function () {
     return `
       <li class="cv-mr${geenWerk ? ' cv-mr--nowork' : ''}${nodeClass(mr.id, ctx.chainSet)}" data-node="${H.escapeHtml(mr.id)}">
         ${selectBox('measurableResult', mr.id, mr.name, ctx)}
-        ${H.statusPill(mr.status, { compact: true, entityType: 'measurableResult' })}
+        ${H.statusPill(mr.status, { compact: true, entityType: 'measurableResult', card: true })}
         ${focusButton(mr.id, mr.name, ctx.chainSet, ctx.focusId, 'cv-mr__name', ctx.print)}
         ${ObeyaData.valueText(mr) ? `<span class="cv-value" title="Stand: ${H.escapeHtml(ObeyaData.valueText(mr, { noDate: true }))}">${H.escapeHtml(ObeyaData.valueText(mr, { short: true }))}</span>` : ''}
         ${geenWerk ? '<span class="cv-tag cv-tag--gap">geen werk</span>' : ''}
@@ -327,7 +327,7 @@ const ObeyaCanvas = (function () {
           ${expandButton(objective.id, ctx)}
         </div>
         <div class="cv-card__meta">
-          ${H.statusPill(objective.status, { entityType: 'objective', compact: kop })}
+          ${H.statusPill(objective.status, { entityType: 'objective', compact: kop, card: true })}
           ${ctx.print ? '' : H.pendingBadge(objective.id)}
           ${kop ? '' : H.coverageLabel(ObeyaData.objectiveCoverage(objective), { compact: true })}
           ${!kop && objective.owner ? H.ownerBadge(objective.owner) : ''}
@@ -374,7 +374,7 @@ const ObeyaCanvas = (function () {
           ${expandButton(item.id, ctx)}
         </div>
         <div class="cv-card__meta">
-          ${H.statusPill(item.status, { entityType: w.type, compact: kop })}
+          ${H.statusPill(item.status, { entityType: w.type, compact: kop, card: true })}
           ${ctx.print ? '' : H.pendingBadge(item.id)}
           ${kop ? '' : H.ownerBadge(item.owner)}
           ${!kop && w.type === 'action' && item.dueDate ? `<span class="cv-due">deadline ${H.escapeHtml(H.formatDate(item.dueDate))}</span>` : ''}
@@ -391,7 +391,7 @@ const ObeyaCanvas = (function () {
         ${acties.length ? `<ul class="cv-actions" aria-label="Acties">${acties.map((a) => `
           <li class="cv-action${nodeClass(a.id, ctx.chainSet)}" data-node="${H.escapeHtml(a.id)}">
             ${selectBox('action', a.id, a.title, ctx)}
-            ${H.statusPill(a.status, { compact: true, entityType: 'action' })}
+            ${H.statusPill(a.status, { compact: true, entityType: 'action', card: true })}
             ${focusButton(a.id, a.title, ctx.chainSet, ctx.focusId, 'cv-action__name')}
             ${a.owner ? `<span class="muted">${H.escapeHtml(a.owner)}</span>` : ''}
           </li>`).join('')}</ul>` : ''}
@@ -575,7 +575,7 @@ const ObeyaCanvas = (function () {
           ${expandButton(mr.id, ctx)}
         </div>
         <div class="cv-card__meta">
-          ${H.statusPill(mr.status, { entityType: 'measurableResult', compact: kop })}
+          ${H.statusPill(mr.status, { entityType: 'measurableResult', compact: kop, card: true })}
           ${ctx.print ? '' : H.pendingBadge(mr.id)}
           ${!kop && mr.owner ? H.ownerBadge(mr.owner) : ''}
           ${ObeyaData.valueText(mr) ? `<span class="cv-value" title="Stand: ${H.escapeHtml(ObeyaData.valueText(mr, { noDate: true }))}">${H.escapeHtml(ObeyaData.valueText(mr, { short: true }))}</span>` : ''}
@@ -960,6 +960,7 @@ const ObeyaCanvas = (function () {
         </div>
         ${focusInfo ? `<span class="canvas-controls__focus">Lijn van <strong>${H.escapeHtml(focusInfo.label)}</strong> <button class="btn btn--ghost btn--small" type="button" data-action="canvas-clear-focus">Wissen</button></span>` : '<span class="muted canvas-controls__hint">Klik op een naam om de lijn te volgen.</span>'}
         <span class="canvas-legend" aria-label="Legenda">
+          ${H.statusLegend()}
           <span class="canvas-legend__item"><span class="canvas-legend__line"></span> draagt bij aan</span>
           <span class="canvas-legend__item"><span class="canvas-legend__line canvas-legend__line--dashed"></span> nog te koppelen / hangt samen met</span>
         </span>
